@@ -38,7 +38,21 @@ Perhaps we do all our data collection with Python, then just submit a Google For
 
 Google sheets would need to have AppsScript to highlight potential duplicates for manual review.
 
+
+TO DO:
+
+Mandy
+Open Hire emails
+Arts Jobs (Neaten up 1 line of code)
+Twitter?
+Facebook
+
+Google Sheets Upload
+Apps Script Filtering ect
+
+
 """
+import pickle
 import time
 
 class Job():
@@ -318,7 +332,69 @@ def Web_Scraping():
 
     # Scrape 1 single Facebook group
     def Facebook():
+        # https://www.facebook.com/groups/backstagetheatrejobs/
+        from selenium.webdriver.common.action_chains import ActionChains
+
+
+        # Use this code to create your own cookie file, logimg in manually in the browser.
+        # driver.get("https://www.facebook.com")
+        # time.sleep(60)
+        # pickle.dump(driver.get_cookies() ,open("cookies.pkl","wb"))
+
+
+        # Login using cookies bucs Facebooks login system is a pain to navigate in html. (Presumably to discourage
+        # bots like me.)
+        driver.get("https://www.facebook.com/groups/backstagetheatrejobs/")
+        cookies = pickle.load(open("cookies.pkl", "rb"))
+        for cookie in cookies:
+            driver.add_cookie(cookie)
+
+        # Occasionally this loads the wrong page, so I'm putting a 3 try loop in and then if it still won't work,
+        # quitting with an error.
+        def load_page():
+            driver.get("https://www.facebook.com/groups/backstagetheatrejobs/")
+
+            time.sleep(1)
+
+            new_activity = driver.find_element_by_xpath("//*[contains(text(), 'New activity')]")
+            new_activity.click()
+            # print(new_activity.location)
+        try:
+            load_page()
+            time.sleep(1)
+        except:
+            try:
+                load_page()
+                time.sleep(1)
+            except:
+                try:
+                    load_page()
+                    time.sleep(5)
+                except:
+                    raise Exception("Tried to load page 3 times, failed 3 times. Quitting")
+
+        # This didn't work but now it does. idk how or why but I'm not questinging it.
+        most_recent = driver.find_element_by_xpath("//*[contains(text(), 'See most recent posts first')]")
+        most_recent.click()
+
+        # Wait a sec for different sort.
+        time.sleep(1)
+
+
+        job_listings = driver.find_element_by_css_selector('div[role="feed"]').find_elements_by_css_selector("*")
+
+        for i in job_listings:
+            body = i.find_element_by_css_selector('div.article')
+            print(body.text)
+            print("\n")
+
+
+
+
+        time.sleep(1000)
+
         pass
+
 
     # Uses google sheets. Not done in Python.
     def Manual_Entry():
@@ -327,6 +403,7 @@ def Web_Scraping():
     # Curtain_Call()
     # The_Stage()
     # Arts_Jobs()
+    Facebook()
 
     # Ensure we quit at the end, no matter what happens previously.
     driver.quit()
