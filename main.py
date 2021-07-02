@@ -487,9 +487,9 @@ def Web_Scraping():
     def Manual_Entry():
         pass
 
-    Curtain_Call()
-    The_Stage()
-    Arts_Jobs()
+    # Curtain_Call()
+    # The_Stage()
+    # Arts_Jobs()
     Facebook()
 
 
