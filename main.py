@@ -71,6 +71,7 @@ class Job():
 
 def Web_Scraping():
     from selenium import webdriver
+    import requests
 
 
     def get_login_details():
@@ -88,6 +89,7 @@ def Web_Scraping():
 
     password = get_login_details()["password"]
     email = get_login_details()["username"]
+    fb_token = get_login_details()["fb_token"]
 
     driver = webdriver.Chrome()
 
@@ -161,8 +163,6 @@ def Web_Scraping():
 
             new_jobs.append(Job(venue= venue, job_title= job_title, link= link, source= source, other_info= other_info))
 
-        # Close the driver
-        driver.close()
 
     # Open Hire does not have a website or an API. They only send out emails. We'll have to scrape their mail sent out.
     def Open_Hire():
@@ -234,7 +234,6 @@ def Web_Scraping():
             new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing, deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
 
 
-        driver.close()
         pass
 
     # Functionally complete, altho could use a little neatening up in 1 place.
@@ -326,17 +325,19 @@ def Web_Scraping():
         print("Finished ArtsJobs.org.uk")
         pass
 
-    # Search twitter for keywords?
+    # Search twitter for keywords? Sounds like a lot of hassle. Maybe if they have a good API?
     def Twitter():
         pass
 
     # Scrape 1 single Facebook group
     def Facebook():
+        import facebook
         # https://www.facebook.com/groups/backstagetheatrejobs/
         from selenium.webdriver.common.action_chains import ActionChains
 
-
-        # Use this code to create your own cookie file, logimg in manually in the browser.
+        # Using Selenium with Facebook has many flaws. Using the API would work far better.
+        """
+       # Use this code to create your own cookie file, logimg in manually in the browser.
         # driver.get("https://www.facebook.com")
         # time.sleep(60)
         # pickle.dump(driver.get_cookies() ,open("cookies.pkl","wb"))
@@ -373,7 +374,7 @@ def Web_Scraping():
                 except:
                     raise Exception("Tried to load page 3 times, failed 3 times. Quitting")
 
-        # This didn't work but now it does. idk how or why but I'm not questinging it.
+        # This didn't work but now it does. idk how or why but I'm not questioning it.
         most_recent = driver.find_element_by_xpath("//*[contains(text(), 'See most recent posts first')]")
         most_recent.click()
 
@@ -383,15 +384,101 @@ def Web_Scraping():
 
         job_listings = driver.find_element_by_css_selector('div[role="feed"]').find_elements_by_css_selector("*")
 
+
+        # We need to hit every see more button
+
         for i in job_listings:
-            body = i.find_element_by_css_selector('div.article')
+            body = i.find_element_by_css_selector('div[dir="auto"]')
             print(body.text)
-            print("\n")
+            print("-------------------------")
 
 
 
 
         time.sleep(1000)
+        """
+
+        # If token has expired, get a new one using instructions here. Make sure to extend it.:
+        # https://towardsdatascience.com/how-to-use-facebook-graph-api-and-extract-data-using-python-1839e19d6999
+        # Must have admin perms in the group to do this.
+
+        # graph = facebook.GraphAPI(access_token=fb_token, version=3.1)
+
+        # Test group id = 734740427307465
+        # backstage theatre jobs id = 13011899629
+
+        r = "/734740427307465/feed"
+        # events = graph.request(r)
+        # print(events)
+        events = {'data': [{'updated_time': '2021-07-02T11:34:47+0000', 'message': 'POSITION: Venue Technician (Stage Management and AV based) \nRATE OF PAY: £22030+ per annum \nDATES: Closing Date 2nd July, Interviews 7th and 8th of July\nLOCATION: Wellington College, Crowthorne, Berkshire\nDESCRIPTION: The College’s Technical team ensures the smooth running of all technical aspects of events that are held in several spaces across the college site, including a relatively new 900+ seated performing arts centre. We put on In-House shows, talks, assemblies, orchestral recitals, conferences and much more. Join us, and you could soon be playing a vital role within our friendly pro-active team. \nAPPLY TO: https://wellingtoncollege.postingpanda.uk/job/173067 for more information and application forms.', 'id': '734740427307465_935369337244572'}, {'updated_time': '2021-07-02T11:34:22+0000', 'message': 'Position: Stage & Flys Technician \nLocation: Grand Opera House Belfast\nSalary: £31,078\nContact Type: 42hrs average per week, Permanent \nClosing Date: 19th July 2021\nhttps://www.goh.co.uk/jobs/stage-flys-technician/', 'id': '734740427307465_935369167244589'}, {'updated_time': '2021-07-02T11:34:09+0000', 'message': 'Hi Everyone, \nLooking for a lighting technician for the following dates: \n1st July - load in - 7am call\n4th July - Load out - 9am call\nLocation - \nChichester \nFee -\n£250 per day \nPlease email me at josh@palmerlighting.co.uk if interested! \nThanks all', 'id': '734740427307465_935369073911265'}, {'updated_time': '2021-07-02T11:33:57+0000', 'message': "It's a really exciting time to join us at Glyndebourne!\nWe are currently offering a wide range of roles including;\nAssistant Stage Manager\nFinance Assistant\nSenior Marketing Manager\nLearning & Engagement Manager\nMembership Operations Assistant\nVideo on Demand Project Lead\n3 roles in our Costume Department\nand a Cover Security Guard\nTake a look below for more details!\nhttps://lnkd.in/dVG24Va\n#recruitment #recruiting #jobs #hiring #jobsearch #Glyndebourne #Glyndebournejobs #eastsussexjobs #sussexjobs #nowhiring", 'id': '734740427307465_935368963911276'}, {'updated_time': '2021-07-02T11:33:46+0000', 'message': 'Technician | Beck Theatre Hayes\n2 posts available \nClosing date: Fri 9 July 2021 at 12:00am\nSalary: £20,000 - £25,000 p/a (dependant on experience)\nPurpose of the role \nProvision as required of technical (stage, electrics, projection and/or sound) support for the preparation and performance of productions and events at The Beck Theatre, and of routine maintenance of buildings and equipment, so as to ensure the highest standards of artistic quality and customer service are offered to theatregoers and other users of The Beck Theatre, and thus support of the achievement of Beck Theatre’s business, service polices and targets.\nOur ideal candidate \nWe are looking to appoint a multi-skilled Technician to ensure a smooth-running, efficient and safe working environment for all staff and visiting companies, to assist with building maintenance and to strive to offer the best possible service to all users of The Beck Theatre. \nAbout HQ Theatres & Hospitality\nThe Beck Theatre is one 12 venues within HQ Theatres & Hospitality’s (HQT&H) current portfolio of regional theatres and concert halls. HQT&H currently manages 18 auditoria on behalf of local authorities, with capacities ranging from a 200 seat arts centre to a 2,400 seated/standing theatre. Last year HQT&H programmed a total of 2,354 shows which attracted attendances of over 1.5 million.\nHQ Theatres & Hospitality (HQT&H), the UK’s second-largest venue operator, is a division of Trafalgar Entertainment.\nPlease visit the website for job description and application form.', 'id': '734740427307465_935368873911285'}, {'updated_time': '2021-07-02T11:33:14+0000', 'message': "POSITION: Lighting / Stage Technicians\nRATE OF PAY: £12/hour\nDATES: \nSaturday 3rd July 2000-0000\nMonday 5th July 0900-2200\nLOCATION: Tara Theatre, Earlsfield, SW18 4ES\nDESCRIPTION: I am looking for a number of people to help with an upcoming production week. Ideally multi-talented individuals to assist with lighting and set fit-ups, a lighting focus and babysitting tech. \nPlease get in touch even if you can't do both days.\nAPPLY TO: technical@taratheatre.com", 'id': '734740427307465_935368617244644'}, {'updated_time': '2021-07-02T11:33:06+0000', 'message': "*Posting on behalf of someone else*\nIf you wish to post a job, please post in this format\nPOSITION: Stage Manager \nRATE OF PAY: 3 weeks @ £494 p/w + £100 day rate for 10th July \nRehearsals Dates:\nSat 10 Jul, 11:00 - 18:30\nMon 12 – Sat 17 Jul, 10:30 - 18:30\nTues 20 - Fri 23 Jul, 10:30 - 18:30\nShow Dates:\n8 Shows in Greenwich Park: 24, 25, 31 July and 01 Aug, 13:00 & 15:00\n3 Shows in Garrison Church (Woolwich): 29 Jul, 13:00 & 15:00 and 30 Jul, 15:00 pm\n1 Street intervention at General Gordon Square: 31 Jul, 11:00\nRehearsal location:\n2 outdoor places in Woolwich Arsenal = Garrison Church and Wellington Park\nhttps://www.stgeorgeswoolwich.org/\nhttps://www.google.com/.../data=!4m12!1m6!3m5!1s0x0...\nIndoors (if the weather doesn't allow us to be outside): at the Tramshed (Woolwich) in bubbles of 6\nShows location: Greenwich Park and Royal Arsenal (locations as above)\nTHE PROJECT: Commedia dell’Tramshed aims at reinventing Commedia with a company of emerging performers and presenting 11 outdoor shows in the borough of Greenwich. Working with the director and technical manager to rig, op, and strike simple sound at each location, creating the book, managing props and masks etc.\nAPPLY TO: andre@tramshed.org\nThanks, all!", 'id': '734740427307465_935368580577981'}, {'updated_time': '2021-07-02T11:32:45+0000', 'message': 'POSITION: Scenic Artist\nRATE OF PAY: $18-20/hr, plus full benefits package\nDATES: Full Time\nLOCATION: 3dx Scenic, Cincinnati OH\nDESCRIPTION: 3dx Scenic is looking for an experienced Scenic Artist to join our team and execute scenic finishes for a wide range of theme park, museum, and corporate projects in our Cincinnati fabrication shop.\nAn excellent candidate must be well-versed in theatrical and display paint methodologies and procedures and be able to work with a team of professionals of different disciplines to achieve the best results. The ideal candidate will have an analytical mind, great organizational skills, a critical eye for details and aesthetics, and a desire to contribute to the success of the team and organization.\nThe goal will be to ensure all projects exceed client expectations while closely following project specifications.\nResponsibilities Include\nPrepare various types of surfaces (wood, steel, dibond, fiberglass, etc) for painting.\nExecution of all scenic treatments using HVLP spray guns, brushes, rollers, sponges, etc for both interior and exterior conditions\nAssist in the creation of paint samples and touch-up kits\nMix and match paints, varnishes, lacquers, shellacs, stains, tints, and other coatings and finishes.\nRefinish and restore previously painted projects\nAssist in maintaining all scenic records (color cards, process sheets, recipes, labels, etc)\nMaintain the safety, order, and cleanliness of all paint areas and equipment\nMaintain strict quality control on a schedule\nWork under the direction of the Charge Artist and with other team members in a collaborative shop environment\nOther duties as assigned\nRequirements\nExperience with theatrical and display scenic practices and products\nStrong knowledge of faux finishing, 3D textures, sculpting, stenciling, color mixing and matching, layout, and scaling.\nPrior experience in a professional theatrical scene shop, event fabrication facility or equivalent\nProficiency with standard shop power tools and HVLP spray guns\nWork from design renders and reference photos\nWork on multiple projects concurrently with little supervision\nExcellent organizational and time-management skills\nAbility to work overtime with advanced notice and occasionally travel on installations to complete paint treatments\nAdditional Skills\nBasic Scenic Carpentry\nSculpting\nDigital Sculpting\nAutomotive Paint Experience\nVinyl Graphic Application\n\nPhysical Demands\nThis position is active and requires standing for 6-8 hours a day, talking, bending, kneeling, stooping, crawling, and climbing. Employees are regularly required to hear and talk. Specific vision abilities required by this position include close and distance vision, color vision, peripheral vision, depth perception, and the ability to focus. This position is in a large fabrication shop, where the employee will be exposed to noise, moving mechanical parts, and fumes and airborne particles. Participation in the Respiratory Protection Program and all other Safety and PPE Programs is mandatory.\nAPPLY TO: Please submit a resume, cover letter, and examples of work through the following website: ', 'id': '734740427307465_935368320578007'}, {'updated_time': '2021-07-02T11:32:26+0000', 'message': 'POSITION: Lighting Programmer - Sleepy Hollow\nRATE OF PAY: £1200 (8 days on site)\nDATES: 16th - 27th July. A production schedule is available upon request, Lx is currently scheduled on site for 8 days.\nLOCATION: Guildford School of Acting, Guildford\nDESCRIPTION: Lighting programmer. Console is ETC Eos Ti. Rig is generics, scrollers & movers. Sleepy Hollow is a musical theatre production for our MA Musical Theatre students. Some of the technical team are current students, some are freelancers. All the creatives are freelancers. LD is John Rainsforth Previous experience of programming EOS for a musical is desired. \nAPPLY TO: Sarah Sage, Technical Manager: s.sage@surrey.ac.uk', 'id': '734740427307465_935368113911361'}, {'updated_time': '2021-07-02T11:32:16+0000', 'message': 'URGENT!\nPOSITION:\nVan Driver\nRATE  OF PAY:\n£13 per hour\nDATES:\nFriday 2nd - Wednesday 7th 09:00-17:00\nLOCATION:\nBarking, East London.\nDESCRIPTION:\nWe are looking for someone to work with us over the next few days to assist with moving equipment around for a few events that we have.\nAPPLY  TO:\naaron@cmpm.co.uk', 'id': '734740427307465_935367973911375'}, {'updated_time': '2021-07-02T11:32:08+0000', 'message': 'POSITION: Full Time Venue Technician\nRATE OF PAY: £21k to £24k commensurate with skills and experience\nDATES: Closing Date 5pm on Friday 16th July, Interviews to be held Thursday 22nd July\nLOCATION: Cliffs Pavilion and Palace Theatre, Southend-On-Sea\nDESCRIPTION: We are delighted to offer this opportunity to join our highly skilled technical team at Southend Theatres.\nSouthend Theatres consists of The Cliffs Pavilion and the Palace Theatre.  The Cliffs Pavilion is a number one touring house, playing host to West End musicals, rock gigs and everything in between.  The Palace Theatre is a traditional Edwardian theatre hosting plays, children’s theatre, live music and much more.  This is an opportunity to become part of the team behind the success!\nAs a Southend Theatres technician, you will work with a variety of people delivering fantastic shows and events and supporting a variety of departments.  You will be involved in all technical aspects of stage and events presentation, ensuring high standards of professionalism and presentation.  You will have the opportunity to put your skills and experience to good use and to learn and develop further in your trade.\nThe successful candidate will have an in-depth working knowledge of lighting and sound rigging and operation, gets ins and get outs, building sets, hemp flying, and technical health and safety. An understanding of fire safety, security requirements, and event planning is desirable. \nA key requirement of this role is a genuine desire to contribute positively and pro-actively to the success that Southend Theatres’ enjoys year after year.  If you would like join the Southend team, we would love to hear from you.\nFor an Application Form and Job Description or an informal discussion about the role, please contact:  Michael Lewins, Technical Manager  01702 350456  michaell@southendtheatres.org.uk.  \nAPPLY TO: Complete the HQ Application Form available at https://hqtheatres.com/careers/technician-southend-2021 and submit with a covering letter to michaell@southendtheatres.org.uk. Tell us why you think you are suited to this role, why it interests you and how we’ll benefit from having you on board!', 'id': '734740427307465_935367897244716'}, {'updated_time': '2021-07-02T11:31:52+0000', 'message': 'Thank you all! I’ve have a lot of emails to go through today and will be taking no more applications. Thanks everyone for your quick response!\nURGENT!!!\nPOSITION: Lighting technician with ETC Ion knowledge\nRATE OF PAY: £12 per hour\nDATE: 3rd July - (This Saturday) - 08:00 - 22:00 with 2 x 1 hour breaks\nLOCATION: Artsdepot, London, N12\nDESCRIPTION: We are looking for someone to cover a shift at Artsdepot (the technician we had booked is having to isolate!) \nThe day will consist of working with a dance company to put on 2 shows, 1 show at 12:45 (45 mins) and a different show at 19:30 (2 hours with an interval). You will be working with the choreographers to come up with some basic lighting, using our general rig, for each show, programming on ETC Ion and operating the shows.\nIf you are interested please email me - jen.watson@artsdepot.co.uk', 'id': '734740427307465_935367757244730'}, {'updated_time': '2021-07-02T11:16:26+0000', 'message': 'test1', 'id': '734740427307465_935360570578782'}], 'paging': {'previous': 'https://graph.facebook.com/v11.0/734740427307465/feed?access_token=EAALfCQXiKlgBAKKV6R8IpKEPXD45fvGGi4lXPMylXeQdGWIaqSaImStdgf9FyVoUB9XAAQCaXlkPH0zwFeItT1i4LJCa3Tol4LEukLJJZBruihNeTPJZAMRArerGVJgk5hSYPlZC6V4EOR77GUVIDKZCjcdZC4WmmRMg906qpHGzeKaye4PQh&__previous=1&since=1625225687&until&__paging_token=enc_AdAZCnjV3aymhiOZC3htQZAOoA81ytTCGfKHZAUx2X2Bek1OMWHACF91WZCtFWjMPBWMqzf2v3lSeHFdT0NGeDlPpFZBJUiOI470ZBIUtXX36WxnAULAqcLzE1E7RhnDOJLTgu9B8U7gG5EuujhZBACyhomTvcs9', 'next': 'https://graph.facebook.com/v11.0/734740427307465/feed?access_token=EAALfCQXiKlgBAKKV6R8IpKEPXD45fvGGi4lXPMylXeQdGWIaqSaImStdgf9FyVoUB9XAAQCaXlkPH0zwFeItT1i4LJCa3Tol4LEukLJJZBruihNeTPJZAMRArerGVJgk5hSYPlZC6V4EOR77GUVIDKZCjcdZC4WmmRMg906qpHGzeKaye4PQh&until=1625224586&since&__paging_token=enc_AdBXkxmSdgvlAyZBeRFFjDoCXv6Pe93XCTJr29GZAwxEIlmbVLQTdgunYlxCn3B9m3OeXEiUQZClB7SBxbOSTHa9V6sYj3QVcnqbuUjFT2IqHOWl9c62ZBZAUSIdt1kL5zfqMbv0ZARgII3iNp2ZAyAAlTa2kEl&__previous'}}
+
+        print(events.values())
+
+        feed = events['data']
+        print(feed[0].values())
+
+        for post in feed:
+            body = post['message'].lower()
+            id = post['id']
+
+            print(body.replace("\n","    "))
+            lines = body.split("\n")
+            variables ={"position":{"result":None,"terms": ["position:","position", "role","title","technician","lx","lighting","sound","stage manager","SM","ASM","DSM","AV"]},
+                        "fee":{"result":None,"terms": ["rate of pay:","rate of pay" , "fee","salary", "pay"]},
+                        "dates":{"result":None,"terms": ["dates:", "date","times", "hours","permanent", "call"]},
+                        "location":{"result":None,"terms": ["location:","location" ,"address"]},
+                        "desc":{"result":None,"terms": ["description"]},
+                        "contact":{"result":None,"terms": ["apply to:","apply to",".co.uk",".com",".org","www."]}
+                        }
+
+            skip = False
+            vars_found = 0
+            for c, line in enumerate(lines):
+                # print(line)
+                if skip:
+                    skip = False
+                    continue
+                for keyword, keyvalue in variables.items():
+
+                    if keyvalue["result"] != None:
+                        # skips this keyword since we've already found it.
+                        continue
+
+                    terms = keyvalue["terms"]
+                    # print(term)
+                    for term in terms:
+                        l = len(term)
+                        # print(keyword["term"],line[:l])
+                        if term in line:
+                            vars_found += 1
+                            # print(f"Matched {term}")
+                            if len(line) > l and line[:l] == term:
+                                # If length of line is more than length of string we are searching for
+                                variables[keyword]["result"] = line[l+1:]
+                                break
+                            elif len(line) > l:
+                                variables[keyword]["result"] = line
+                                break
+                            else:
+                                # if not, then 99% chance that result is in the next line.
+                                # Skip the next line.
+                                variables[keyword]["result"] = lines[c+1]
+                                skip = True
+                                break
+
+
+
+            print("Came up with:")
+            print(variables)
+            print("\n")
+
+            if vars_found > 3 and variables["contact"]["result"] != None:
+                link = "https://www.facebook.com/" + id
+                new_jobs.append(Job(venue=variables['location'], job_title=variables['position'], link=link, deadline=variables['dates'], fee=variables['fee'], source="https://www.facebook.com/groups/backstagetheatrejobs/", other_info=variables['contact']))
+
+
+            print("------------------------------------------------")
+            print("\n")
 
         pass
 
@@ -400,16 +487,21 @@ def Web_Scraping():
     def Manual_Entry():
         pass
 
-    # Curtain_Call()
-    # The_Stage()
-    # Arts_Jobs()
+    Curtain_Call()
+    The_Stage()
+    Arts_Jobs()
     Facebook()
+
+
 
     # Ensure we quit at the end, no matter what happens previously.
     driver.quit()
 
+    print("\n \n \n \n \n \n \n \n \n")
+    print(new_jobs[0].__dict__.keys())
+    print("\n \n \n")
     for job in new_jobs:
-        print(job.__dict__)
+        print(", ".join([x for x in list(job.__dict__.values()) if isinstance(x,str)]))
 
 Web_Scraping()
 # Filtering
