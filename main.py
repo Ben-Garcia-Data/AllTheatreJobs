@@ -1,10 +1,9 @@
 import time
 
 class Job():
-    def __init__(self, venue=None, location=None, twitter_handle=None, job_title=None, link=None, deadline=None,
+    def __init__(self, venue=None, location=None, job_title=None, link=None, deadline=None,
                  fee="Unknown", source = None, other_info = None):
         self.location = location
-        self.twitter_handle = twitter_handle
         self.job_title = job_title
         self.link = link
         self.deadline = deadline
@@ -13,12 +12,15 @@ class Job():
         self.source = source
         self.other_info = other_info
 
-        self.debug = self.__dict__
-
 
 def Web_Scraping():
     from selenium import webdriver
     from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.common.by import By
+    from selenium.common.exceptions import TimeoutException
+
     driver = webdriver.Chrome(ChromeDriverManager().install())
 
     def get_login_details():
@@ -35,6 +37,7 @@ def Web_Scraping():
         return j
 
     password = get_login_details()["password"]
+    CCpassword = get_login_details()['CurtainCallPassword']
     email = get_login_details()["username"]
     fb_token = get_login_details()["fb_token"]
 
@@ -76,11 +79,28 @@ def Web_Scraping():
         # https://www.curtaincallonline.com/find-jobs/
         # Curtain call does not give any fees, deadlines (sometimes put into other) or general locations.
 
+        # Login
+
+        driver.get("https://www.curtaincallonline.com/sign-in/")
+
+        driver.find_element_by_id("id_login").send_keys(email)
+        driver.find_element_by_id("id_password").send_keys(CCpassword)
+        driver.find_element_by_class_name("primaryAction").click()
+
+        time.sleep(1)
+
         # Fetch data
         driver.get("https://www.curtaincallonline.com/find-jobs/")
+
+        time.sleep(1)
+        delay = 1
+        try:
+            p_element = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, "result-block")))
+
+        except TimeoutException:
+            print("Loading took too much time!")
+        #
         p_element = driver.find_elements_by_class_name("result-block")
-
-
         # print(p_element)
         results = []
 
@@ -89,25 +109,34 @@ def Web_Scraping():
         # unnecessary reloads.
 
         for job_listing in p_element:
-            info = job_listing.text.split("\n")
-            venue = info[1]
-            source = driver.find_element_by_link_text(info[0]).get_attribute("href")
-            print(f"{venue=} {source=}")
-            results.append([venue,source])
+            source = driver.find_element_by_link_text(job_listing.text.split("\n")[0]).get_attribute("href")
+            # print(f"{venue=} {source=}")
+            results.append(source)
+
+
+        print(f"{len(results)} jobs from Curtain Call")
+
+
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
-            driver.get(job_listing[1])
-            info = driver.find_elements_by_class_name("block")[1].text.split("\n")
+            driver.get(job_listing)
 
-            venue = job_listing[0]
-            job_title = info[0][info[0].find(": ") + 2:]
-            link = driver.current_url
-            source = "Curtain Call"
-            other_info =f"{info[5]}, {info[3]}"
+            role = driver.find_element_by_id("role")
+            pay = driver.find_element_by_id("payment")
+            extra_info = driver.find_element_by_id("job-details-about")
 
-            new_jobs.append(Job(venue= venue, job_title= job_title, link= link, source= source, other_info= other_info))
+            role = role.text.split("\n")
+            pay =  pay.text.split("\n")
+            extra_info = extra_info.text.split("\n")
 
+            job_title = role[0][9:]
+            other_info = role[2][14:]
+            employer = role[3][10:]
+            fee = pay[0][15:]
+            deadline = extra_info[2][18:]
+
+            new_jobs.append(Job(venue= employer, job_title= job_title, link= job_listing, deadline= deadline, fee= fee, source= "Curtain Call", other_info= other_info))
 
     # Open Hire does not have a website or an API. They only send out emails. We'll have to scrape their mail sent out.
     def Open_Hire():
@@ -123,7 +152,7 @@ def Web_Scraping():
         p_elements = driver.find_elements_by_class_name("job-container")
 
         links = []
-        print("Finding all job ads on all pages.")
+        # print("Finding all job ads on all pages.")
 
         def add_links(elements):
 
@@ -146,7 +175,8 @@ def Web_Scraping():
             p_elements = driver.find_elements_by_class_name("job-container")[1:] # The first item in the list will
             # always (I think always)
 
-        print("Going through every individual job listing.")
+        print(f"{len(links)} jobs from The Stage")
+        # print("Going through every individual job listing.")
         for c, job_listing in enumerate(links):
             driver.get(job_listing)
             if c == 0:
@@ -166,7 +196,7 @@ def Web_Scraping():
 
 
             info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
-            print(info)
+            # print(info)
             job_title = info[0]
             venue = info[1]
             location = info[5]
@@ -176,7 +206,7 @@ def Web_Scraping():
 
 
 
-            new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing, deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
+            new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing[:-1], deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
 
 
         pass
@@ -225,7 +255,7 @@ def Web_Scraping():
                     # print(link)
                     all_links.append(link)
                 page += 1
-                print(f"Going to page {page}")
+                # print(f"Going to page {page}")
                 driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
                 p_elements = driver.find_element_by_class_name("aj-listing").find_elements_by_tag_name("li")
 
@@ -233,10 +263,12 @@ def Web_Scraping():
             print("Hit an error on artsjobs.org.uk This was almost certainly due reaching the end of the jobs listed "
                   "on the main pages. We'll now go through each one individually.")
 
-
+        print(f"{len(all_links)} jobs from The Stage")
         # Poor site formatting & standardisation here. Not gonna be much data we can consistantly get.
         for c, url in enumerate(all_links):
-            print("Job # ")
+
+            # print(f"link {c}")
+
             driver.get(url)
             try:
                 title = driver.find_element_by_tag_name("h2").text.split(",")
@@ -251,6 +283,10 @@ def Web_Scraping():
 
             info = driver.find_element_by_class_name("aj-post-single").find_elements_by_tag_name("li")
 
+            if len(info) != 6:
+                print("Error. Not enough data found on page.")
+                continue
+
             deadline = info[0].text[6:]
             location = info[1].text[8:]
 
@@ -263,15 +299,11 @@ def Web_Scraping():
 
             # print([venue,location,job_title,deadline,fee,contact])
 
-            new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url, deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
+            new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
 
 
 
         print("Finished ArtsJobs.org.uk")
-        pass
-
-    # Search twitter for keywords? Sounds like a lot of hassle. Maybe if they have a good API?
-    def Twitter():
         pass
 
     # Scrape 1 single Facebook group
@@ -431,24 +463,62 @@ def Web_Scraping():
         pass
 
 
-    # Uses google sheets. Not done in Python.
-    def Manual_Entry():
-        pass
-
+    # Choose which to run.
     Curtain_Call()
     # The_Stage()
     # Arts_Jobs()
     # Facebook()
 
-
-
     # Ensure we quit at the end, no matter what happens previously.
     driver.quit()
 
-    print("\n \n \n")
-    for job in new_jobs:
-        print(job.debug)
 
-Web_Scraping()
+    return new_jobs
+
+
+
+def store_data(data):
+    import pandas
+    df1 = pandas.DataFrame([x.__dict__ for x in data])
+
+    pandas.set_option('display.max_columns', 500)
+
+    # print(df1)
+    try:
+        df1.to_csv("JobsData.csv", index=False)
+    except:
+        print("Error recording all these jobs")
+        time.sleep(30)
+        df1.to_csv("JobsData.csv", index=False)
+
+    import mysql.connector
+
+    mydb = mysql.connector.connect(
+        host="localhost",
+        username="root",
+        password="password",
+        database="TheatreJobs"
+    )
+
+    print(mydb)
+
+    mycursor = mydb.cursor()
+
+    import datetime
+    date = datetime.date.today().strftime()
+
+    mycursor.execute(f"CREATE TABLE {date}_JOBS (Venue text, location text, job_title text, link text, deadline text, fee text, source text, other_info text)")
+    mydb.commit()
+
+    df1.to_sql(f"{date}_JOBS", mycursor, if_exists='replace',index=False)
+
+    mycursor.execute(f'SELECT * FROM {date}_JOBS')
+
+    for row in mycursor.fetchall():
+        print(row)
+
+
+
+store_data(Web_Scraping())
 # Filtering
 # Upload to Google docs
