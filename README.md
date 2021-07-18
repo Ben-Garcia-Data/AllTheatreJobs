@@ -32,21 +32,28 @@ Automatic fortmatting
 Manual review
 Manual posting
 
-For the web scraping, data comparison & collation, Python feels like the best tool.
-For the formatting, review & storage, could we use Google Sheets? Much more accessible as a front end tool.
-Google sheets would also be good as a manual Entry tool (using google forms)
-Perhaps we do all our data collection with Python, then just submit a Google Form via Python to get our data to Google Sheets?
+The current setup is:
+  Data scraping using Selenium in Python
+  Data is cleaned and filtered.
+  Data storage in an SQL Database on my personal server.
+  
+Future additions to the setup will be:
+  Automated removal of entries which have been seen before
+  Automated removal of duplicate entries (same job on 2 different sites)
+  Upload data to more accesible location
+  Automated filtering of data.
+  Manual review of data.
+  Automated formatting of approved entries.
+  Post to twitter! (Manually)
 
-Google sheets would need to have AppsScript to highlight potential duplicates for manual review.
 
 
 TO DO:
 
 Mandy
 Open Hire emails
-Arts Jobs (Neaten up 1 line of code)
 Twitter?
-Facebook
+Facebook # Code is written. It just needs the permission of the gorup owners.
 
 Google Sheets Upload
 Apps Script Filtering ect
