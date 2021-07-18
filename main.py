@@ -21,7 +21,11 @@ def Web_Scraping():
     from selenium.webdriver.common.by import By
     from selenium.common.exceptions import TimeoutException
 
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    """driver = webdriver.Chrome(ChromeDriverManager().install())"""
+
+    from selenium.webdriver import Chrome
+
+    driver = Chrome()
 
     def get_login_details():
         import json
