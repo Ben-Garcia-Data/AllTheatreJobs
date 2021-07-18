@@ -517,7 +517,7 @@ def store_data(data):
     for row in mycursor.fetchall():
         print(row)
 
-    # Test commit 2
+    # Test commit 3
 
 
 store_data(Web_Scraping())
