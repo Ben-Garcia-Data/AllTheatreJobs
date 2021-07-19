@@ -22,16 +22,16 @@ def Web_Scraping():
     from selenium.common.exceptions import TimeoutException
     from selenium.webdriver import ChromeOptions
 
-    """driver = webdriver.Chrome(ChromeDriverManager().install())"""
+    # driver = webdriver.Chrome(ChromeDriverManager().install()) # Not working
 
     from selenium.webdriver import Chrome
 
     chrome_options = ChromeOptions()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-dev-shm-usage')#  Use these to bypass OS security (bad)
 
-    driver = Chrome()
+    driver = Chrome(chrome_options = chrome_options)
 
 
 
