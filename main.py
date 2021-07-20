@@ -36,6 +36,12 @@ def Web_Scraping():
     from selenium.common.exceptions import TimeoutException
     from selenium.webdriver import ChromeOptions
 
+    def document_initialised(driver):
+        return driver.execute_script("return initialised")
+
+    def wait_until_loaded():
+        WebDriverWait(driver).until(document_initialised)
+
     # driver = webdriver.Chrome(ChromeDriverManager().install())
     # driver = webdriver.Chrome(ChromeDriverManager().install()) # Not working
 
@@ -105,6 +111,8 @@ def Web_Scraping():
 
         driver.get("https://www.curtaincallonline.com/sign-in/")
 
+        wait_until_loaded()
+
         driver.find_element_by_id("id_login").send_keys(email)
         driver.find_element_by_id("id_password").send_keys(CCpassword)
         driver.find_element_by_id("hs-eu-confirmation-button").click()
@@ -144,6 +152,7 @@ def Web_Scraping():
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
+            wait_until_loaded()
             print(f"{job_listing}")
             driver.get(job_listing)
 
@@ -173,6 +182,7 @@ def Web_Scraping():
         # https://www.thestage.co.uk/jobs/theatre-vacancies This is ALL the vacancies on their website.
 
         driver.get("https://www.thestage.co.uk/jobs/theatre-vacancies")
+        wait_until_loaded()
         driver.find_element_by_class_name("ceb-wrapper").find_element_by_css_selector("button").click()
         p_elements = driver.find_elements_by_class_name("job-container")
 
