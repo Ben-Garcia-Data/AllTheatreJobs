@@ -525,8 +525,7 @@ def store_data(data):
         host="localhost",
         user=sqlUsername,
         password=sqlPassword,
-        database="TheatreJobs",
-        auth_plugin='mysql_native_password'
+        database="TheatreJobs"
     )
 
     print(mydb)
