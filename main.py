@@ -525,7 +525,8 @@ def store_data(data):
         host="localhost",
         user=sqlUsername,
         password=sqlPassword,
-        database="TheatreJobs"
+        database="TheatreJobs",
+        auth_plugin='mysql_native_password'
     )
 
     print(mydb)
@@ -544,6 +545,8 @@ def store_data(data):
 
     for row in mycursor.fetchall():
         print(row)
+
+    mydb.close()
 
     # Test commit 3
 
