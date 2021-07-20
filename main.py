@@ -33,9 +33,16 @@ def Web_Scraping():
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')#  Use these to bypass OS security (bad)
 
-    driver = Chrome(chrome_options = chrome_options)
+    # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
 
-
+    from sys import platform
+    print(f"Looks like we're running on {platform}")
+    if "win" in platform:
+        driver = Chrome(chrome_options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
+    elif "linux" in platform:
+        driver = Chrome(chrome_options=chrome_options)
+    else:
+        print("Unknown platform")
 
     def get_login_details():
         import json
@@ -99,7 +106,9 @@ def Web_Scraping():
 
         driver.find_element_by_id("id_login").send_keys(email)
         driver.find_element_by_id("id_password").send_keys(CCpassword)
+        driver.find_element_by_id("hs-eu-confirmation-button").click()
         driver.find_element_by_class_name("primaryAction").click()
+
 
         time.sleep(1)
 
@@ -134,6 +143,7 @@ def Web_Scraping():
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
+            print(f"{job_listing}")
             driver.get(job_listing)
 
             role = driver.find_element_by_id("role")
