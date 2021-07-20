@@ -43,9 +43,9 @@ def Web_Scraping():
     from sys import platform
     print(f"Looks like we're running on {platform}")
     if "win" in platform:
-        driver = Chrome(chrome_options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
+        driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
     elif "linux" in platform:
-        driver = Chrome(chrome_options=chrome_options)
+        driver = Chrome(options=chrome_options)
     else:
         print("Unknown platform")
 
