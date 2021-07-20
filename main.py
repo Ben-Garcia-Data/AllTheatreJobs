@@ -1,5 +1,7 @@
 import time
 
+# Test commit 2
+
 class Job():
     def __init__(self, venue=None, location=None, job_title=None, link=None, deadline=None,
                  fee="Unknown", source = None, other_info = None):
@@ -22,18 +24,36 @@ def Web_Scraping():
     from selenium.common.exceptions import TimeoutException
     from selenium.webdriver import ChromeOptions
 
+<<<<<<< HEAD
     # driver = webdriver.Chrome(ChromeDriverManager().install())
+=======
+    # driver = webdriver.Chrome(ChromeDriverManager().install()) # Not working
+>>>>>>> 3d7cd7f639d8fc14189767464e5833b0449965cf
 
     from selenium.webdriver import Chrome
     print("Imported Chrome")
     chrome_options = ChromeOptions()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
+<<<<<<< HEAD
     chrome_options.add_argument('--disable-dev-shm-usage')
     print("Set Chrome Options")
     driver = Chrome(chrome_options=chrome_options)
     print("Started chrome running")
+=======
+    chrome_options.add_argument('--disable-dev-shm-usage')#  Use these to bypass OS security (bad)
 
+    # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
+>>>>>>> 3d7cd7f639d8fc14189767464e5833b0449965cf
+
+    from sys import platform
+    print(f"Looks like we're running on {platform}")
+    if "win" in platform:
+        driver = Chrome(chrome_options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
+    elif "linux" in platform:
+        driver = Chrome(chrome_options=chrome_options)
+    else:
+        print("Unknown platform")
 
     def get_login_details():
         import json
@@ -97,7 +117,9 @@ def Web_Scraping():
 
         driver.find_element_by_id("id_login").send_keys(email)
         driver.find_element_by_id("id_password").send_keys(CCpassword)
+        driver.find_element_by_id("hs-eu-confirmation-button").click()
         driver.find_element_by_class_name("primaryAction").click()
+
 
         time.sleep(1)
 
@@ -132,6 +154,7 @@ def Web_Scraping():
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
+            print(f"{job_listing}")
             driver.get(job_listing)
 
             role = driver.find_element_by_id("role")
