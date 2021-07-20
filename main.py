@@ -14,6 +14,18 @@ class Job():
         self.source = source
         self.other_info = other_info
 
+def get_login_details():
+    import json
+    import os
+
+    cwd = os.getcwd()
+    file_name = "config.txt"
+    d = os.path.join(cwd, file_name)
+
+    f = open(file_name, "r")
+    j = json.load(f)
+    return j
+
 
 def Web_Scraping():
     from selenium import webdriver
@@ -44,18 +56,7 @@ def Web_Scraping():
     else:
         print("Unknown platform")
 
-    def get_login_details():
-        import json
-        import os
 
-        cwd = os.getcwd()
-        file_name = "config.txt"
-        d = os.path.join(cwd, file_name)
-
-
-        f = open(file_name,"r")
-        j = json.load(f)
-        return j
 
     password = get_login_details()["password"]
     CCpassword = get_login_details()['CurtainCallPassword']
@@ -517,10 +518,13 @@ def store_data(data):
 
     import mysql.connector
 
+    sqlUsername = get_login_details()["sqlUsername"]
+    sqlPassword = get_login_details()["sqlPassword"]
+
     mydb = mysql.connector.connect(
         host="localhost",
-        username="root",
-        password="password",
+        user=sqlUsername,
+        password=sqlPassword,
         database="TheatreJobs"
     )
 
