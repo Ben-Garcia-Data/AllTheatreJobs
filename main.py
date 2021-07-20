@@ -33,11 +33,6 @@ def Web_Scraping():
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-    print("Set Chrome Options")
-    driver = Chrome(chrome_options=chrome_options)
-    print("Started chrome running")
-    chrome_options.add_argument('--disable-dev-shm-usage')#  Use these to bypass OS security (bad)
-
     # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
 
     from sys import platform
