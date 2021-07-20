@@ -22,17 +22,17 @@ def Web_Scraping():
     from selenium.common.exceptions import TimeoutException
     from selenium.webdriver import ChromeOptions
 
-    """driver = webdriver.Chrome(ChromeDriverManager().install())"""
+    # driver = webdriver.Chrome(ChromeDriverManager().install())
 
     from selenium.webdriver import Chrome
-
+    print("Imported Chrome")
     chrome_options = ChromeOptions()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
-
-    driver = Chrome()
-
+    print("Set Chrome Options")
+    driver = Chrome(chrome_options=chrome_options)
+    print("Started chrome running")
 
 
     def get_login_details():
