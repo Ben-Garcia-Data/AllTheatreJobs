@@ -146,7 +146,7 @@ def Web_Scraping():
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
-            time.sleep(1)
+            time.sleep(0.1)
             print(f"{job_listing}")
             driver.get(job_listing)
 
@@ -537,7 +537,7 @@ def store_data(data):
     mycursor = mydb.cursor()
 
     import datetime
-    date = datetime.date.today().strftime()
+    date = datetime.date.today().strftime(("%m/%d/%Y, %H:%M:%S")
 
     mycursor.execute(f"CREATE TABLE {date}_JOBS (Venue text, location text, job_title text, link text, deadline text, fee text, source text, other_info text)")
     mydb.commit()
