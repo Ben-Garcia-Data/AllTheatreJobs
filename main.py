@@ -532,17 +532,13 @@ def store_data(data):
         database="TheatreJobs"
     )
 
-    print(mydb)
 
     mycursor = mydb.cursor()
 
     import datetime
-    date = datetime.date.today().strftime(("%d_%M_%Y__%H_%M_%S"))
+    date = datetime.date.today().strftime(("%d_%M_%Y"))
 
     tableName = f"{date}_JOBS"
-
-    mycursor.execute(f"CREATE TABLE {tableName} (Venue text, location text, job_title text, link text, deadline text, fee text, source text, other_info text)")
-    mydb.commit()
 
     df1.to_sql(tableName, con=mydb,if_exists='replace',index=False)
 
