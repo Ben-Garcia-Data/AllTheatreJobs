@@ -524,14 +524,17 @@ def store_data(data):
 
     sqlUsername = get_login_details()["sqlUsername"]
     sqlPassword = get_login_details()["sqlPassword"]
+    dbName = "TheatreJobs"
 
     mydb = mysql.connector.connect(
         host="localhost",
         user=sqlUsername,
         password=sqlPassword,
-        database="TheatreJobs"
+        database=dbName
     )
 
+    from sqlalchemy import create_engine
+    engine = create_engine(f'mysql://{sqlUsername}@localhost/{dbName}')
 
     mycursor = mydb.cursor()
 
@@ -540,7 +543,7 @@ def store_data(data):
 
     tableName = f"{date}_JOBS"
 
-    df1.to_sql(tableName, con=mydb,if_exists='replace',index=False)
+    df1.to_sql(tableName, con=engine,if_exists='replace',index=False)
 
     mycursor.execute(f'SELECT * FROM {tableName}')
 
