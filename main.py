@@ -539,14 +539,14 @@ def store_data(data):
     import datetime
     date = datetime.date.today().strftime(("%d_%M_%Y__%H_%M_%S"))
 
+    tableName = f"{date}_JOBS"
 
-
-    mycursor.execute(f"CREATE TABLE {date}_JOBS (Venue text, location text, job_title text, link text, deadline text, fee text, source text, other_info text)")
+    mycursor.execute(f"CREATE TABLE {tableName} (Venue text, location text, job_title text, link text, deadline text, fee text, source text, other_info text)")
     mydb.commit()
 
-    df1.to_sql(f"{date}_JOBS", mycursor, if_exists='replace',index=False)
+    df1.to_sql(tableName, con=mydb,if_exists='replace',index=False)
 
-    mycursor.execute(f'SELECT * FROM {date}_JOBS')
+    mycursor.execute(f'SELECT * FROM {tableName}')
 
     for row in mycursor.fetchall():
         print(row)
