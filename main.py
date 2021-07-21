@@ -537,7 +537,7 @@ def store_data(data):
     mycursor = mydb.cursor()
 
     import datetime
-    date = datetime.date.today().strftime(("%m/%d/%Y, %H:%M:%S")
+    date = datetime.date.today().strftime(("%m/%d/%Y, %H:%M:%S"))
 
     mycursor.execute(f"CREATE TABLE {date}_JOBS (Venue text, location text, job_title text, link text, deadline text, fee text, source text, other_info text)")
     mydb.commit()
