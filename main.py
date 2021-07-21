@@ -534,7 +534,7 @@ def store_data(data):
     )
 
     from sqlalchemy import create_engine
-    engine = create_engine(f'mysql://{sqlUsername}@localhost/{dbName}')
+    engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
 
     mycursor = mydb.cursor()
 
