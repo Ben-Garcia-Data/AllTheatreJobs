@@ -55,6 +55,7 @@ def Web_Scraping():
     print(f"Looks like we're running on {platform}")
 
     def start_driver(chrome_options):
+        print(chrome_options.arguments)
 
         if "win" in platform:
             driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
