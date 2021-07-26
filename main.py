@@ -231,10 +231,13 @@ def Web_Scraping():
                         driver.find_element_by_id("cookies-eu-accept").click()
                     except:
                         print("Couldn't accept cookies.")
-                        # driver.save_screenshot("website.png")
 
 
                 # Put in our username and password to the login
+
+                # If we are using headless mode, this will cause an error when logging in.
+                # If we aren't using headless mode, we are unable to start the driver.
+
                 # time.sleep(1)
                 e = driver.find_element_by_id("aoLogin-email")
                 e.send_keys(email)
@@ -244,8 +247,13 @@ def Web_Scraping():
                 driver.find_element_by_id("aoLogin-Login").click()
 
             # driver.save_screenshot("website2.png")
+
+
             time.sleep(1)
-            info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
+            try:
+                info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
+            except:
+                print("Error finding first job. We probably failed to login.")
             # print(info)
             job_title = info[0]
             venue = info[1]
@@ -507,8 +515,8 @@ def Web_Scraping():
 
     # We run items which need to be run NOT in headless mode FIRST.
 
-    The_Stage()
-    # Arts_Jobs()
+    # The_Stage()
+    Arts_Jobs()
     # Curtain_Call()
 
     # Facebook()
