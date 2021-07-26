@@ -43,10 +43,9 @@ def Web_Scraping():
     # print("Imported Chrome")
 
 
-    def SetDriverOptions(headless):
+    def SetDriverOptions():
         chrome_options = ChromeOptions()
-        if headless:
-            chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         return chrome_options
@@ -54,11 +53,8 @@ def Web_Scraping():
     from sys import platform
     print(f"Looks like we're running on {platform}")
 
-    def start_driver(headless = False):
-
-        chrome_options = SetDriverOptions(headless)
-        print(chrome_options.arguments)
-
+    def start_driver():
+        chrome_options = SetDriverOptions()
         if "win" in platform:
             driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
         elif "linux" in platform:
@@ -84,23 +80,15 @@ def Web_Scraping():
 
         """
         Mandy rules:
-
         https://www.mandy.com/uk/terms-and-conditions#5
-
         3.4. Intellectual property and your use of content
         You may not copy, modify, distribute or commercially exploit any content (other than content provided by you) in any form or in any media, except that you may retrieve and display content on your computer and print and/or store one copy of individual pages for your internal, personal use.
-
         5.1. Restrictions on commercial use
         Unless you register and create a profile with us as a service provider or subscribe for our advertising Service (and pay the applicable fees) (see PART B below), you may not use the Site or any Service (including any email or communication service) to advertise, solicit or promote any products or services.
-
-
         5.2. Prohibition on unlawful use of content
         You may not make any unlawful or unauthorised use of any content, including:
-
         distributing to third parties any audition or casting information obtained on a Site;
         ((I mean, technical stuff is neither audition or casting infomation...))
-
-
         Summary: DO NOT link back to Mandy and then you have sourced the info from an external site, since Mandy
         allow us to follow links on their site and cannot control our use of data on other sites, we basically have
         to take all info from external sites.
@@ -112,6 +100,7 @@ def Web_Scraping():
 
 
         # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
+
         driver = start_driver()
 
         print("Starting Curtain Call")
@@ -243,7 +232,6 @@ def Web_Scraping():
                     except:
                         print("Couldn't accept cookies.")
                         # driver.save_screenshot("website.png")
-                time.sleep(1)
 
 
                 # Put in our username and password to the login
@@ -256,7 +244,7 @@ def Web_Scraping():
                 driver.find_element_by_id("aoLogin-Login").click()
 
             # driver.save_screenshot("website2.png")
-            # time.sleep(1)
+            time.sleep(1)
             info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
             # print(info)
             job_title = info[0]
@@ -385,22 +373,17 @@ def Web_Scraping():
         #river.get("https://www.facebook.com")
         time.sleep(60)
         pickle.dump(driver.get_cookies() ,open("cookies.pkl","wb"))
-
-
         # Login using cookies bucs Facebooks login system is a pain to navigate in html. (Presumably to discourage
         # bots like me.)
         driver.get("https://www.facebook.com/groups/backstagetheatrejobs/")
         cookies = pickle.load(open("cookies.pkl", "rb"))
         for cookie in cookies:
             driver.add_cookie(cookie)
-
         # Occasionally this loads the wrong page, so I'm putting a 3 try loop in and then if it still won't work,
         # quitting with an error.
         def load_page():
             driver.get("https://www.facebook.com/groups/backstagetheatrejobs/")
-
             time.sleep(1)
-
             new_activity = driver.find_element_by_xpath("//*[contains(text(), 'New activity')]")
             new_activity.click()
             # print(new_activity.location)
@@ -418,28 +401,17 @@ def Web_Scraping():
                     time.sleep(1)
                 except:
                     raise Exception("Tried to load page 3 times, failed 3 times. Quitting")
-
         # This didn't work but now it does. idk how or why but I'm not questioning it.
         most_recent = driver.find_element_by_xpath("//*[contains(text(), 'See most recent posts first')]")
         most_recent.click()
-
         # Wait a sec for different sort.
         time.sleep(1)
-
-
         job_listings = driver.find_element_by_css_selector('div[role="feed"]').find_elements_by_css_selector("*")
-
-
         # We need to hit every see more button
-
         for i in job_listings:
             body = i.find_element_by_css_selector('div[dir="auto"]')
             print(body.text)
             print("-------------------------")
-
-
-
-
         time.sleep(1000)
         """
 
