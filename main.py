@@ -43,7 +43,7 @@ def Web_Scraping():
     # print("Imported Chrome")
 
 
-    def SetDriverOptions(headless = False):
+    def SetDriverOptions(headless):
         chrome_options = ChromeOptions()
         if headless:
             chrome_options.add_argument('--headless')
@@ -54,7 +54,9 @@ def Web_Scraping():
     from sys import platform
     print(f"Looks like we're running on {platform}")
 
-    def start_driver(chrome_options):
+    def start_driver(headless = False):
+
+        chrome_options = SetDriverOptions(headless)
         print(chrome_options.arguments)
 
         if "win" in platform:
@@ -110,8 +112,7 @@ def Web_Scraping():
 
 
         # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
-        chrome_options = SetDriverOptions(headless=True)
-        driver = start_driver(chrome_options)
+        driver = start_driver()
 
         print("Starting Curtain Call")
         # https://www.curtaincallonline.com/find-jobs/
@@ -192,8 +193,7 @@ def Web_Scraping():
         print("Starting The Stage Jobs")
         # https://www.thestage.co.uk/jobs/theatre-vacancies This is ALL the vacancies on their website.
 
-        chrome_options = SetDriverOptions()
-        driver = start_driver(chrome_options)
+        driver = start_driver()
 
         driver.get("https://www.thestage.co.uk/jobs/theatre-vacancies")
         time.sleep(1)
@@ -283,8 +283,7 @@ def Web_Scraping():
         # and out so we got a few sleeps just to be sure those items have animated out of our way.
         # The actual job pages also have very little in the way of formatting. :(
 
-        chrome_options = SetDriverOptions()
-        driver = start_driver(chrome_options)
+        driver = start_driver()
 
         page = 1
         driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
