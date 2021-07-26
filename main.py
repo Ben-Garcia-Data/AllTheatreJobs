@@ -40,13 +40,20 @@ def Web_Scraping():
     # driver = webdriver.Chrome(ChromeDriverManager().install()) # Not working
 
     from selenium.webdriver import Chrome
-    print("Imported Chrome")
+    # print("Imported Chrome")
     chrome_options = ChromeOptions()
+
+    def SetDriverOptions(headless = False):
+        if headless:
+            chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
 
     from sys import platform
     print(f"Looks like we're running on {platform}")
 
     def start_driver():
+        SetDriverOptions()
         if "win" in platform:
             driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
         elif "linux" in platform:
@@ -98,9 +105,7 @@ def Web_Scraping():
     # DONE
     def Curtain_Call():
 
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
+
         # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
 
         driver = start_driver()
@@ -233,7 +238,7 @@ def Web_Scraping():
                         driver.find_element_by_id("cookies-eu-accept").click()
                     except:
                         print("Couldn't accept cookies.")
-                        driver.save_screenshot("website.png")
+                        # driver.save_screenshot("website.png")
 
 
                 # Put in our username and password to the login
@@ -245,7 +250,7 @@ def Web_Scraping():
 
                 driver.find_element_by_id("aoLogin-Login").click()
 
-            driver.save_screenshot("website2.png")
+            # driver.save_screenshot("website2.png")
             time.sleep(1)
             info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
             # print(info)
