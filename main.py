@@ -316,7 +316,7 @@ def Web_Scraping():
                     # print(link)
                     all_links.append(link)
                 page += 1
-                # print(f"Going to page {page}")
+                print(f"Going to page {page}")
                 driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
                 p_elements = driver.find_element_by_class_name("aj-listing").find_elements_by_tag_name("li")
 
@@ -329,6 +329,7 @@ def Web_Scraping():
         for c, url in enumerate(all_links):
 
             # print(f"link {c}")
+            print(url)
 
             driver.get(url)
             try:
