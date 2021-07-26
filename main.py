@@ -42,19 +42,19 @@ def Web_Scraping():
     from selenium.webdriver import Chrome
     print("Imported Chrome")
     chrome_options = ChromeOptions()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
 
     from sys import platform
     print(f"Looks like we're running on {platform}")
-    if "win" in platform:
-        driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
-    elif "linux" in platform:
-        driver = Chrome(options=chrome_options)
-    else:
-        print("Unknown platform")
+
+    def start_driver():
+        if "win" in platform:
+            driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
+        elif "linux" in platform:
+            driver = Chrome(options=chrome_options)
+        else:
+            print("Unknown platform")
+
+        return driver
 
 
 
@@ -97,6 +97,14 @@ def Web_Scraping():
 
     # DONE
     def Curtain_Call():
+
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        # 2 different ways to run. 1 for Windows, 1 for Ubuntu. This deals with the issue of chromedriver (not) being in PATH.
+
+        driver = start_driver()
+
         print("Starting Curtain Call")
         # https://www.curtaincallonline.com/find-jobs/
         # Curtain call does not give any fees, deadlines (sometimes put into other) or general locations.
@@ -158,13 +166,14 @@ def Web_Scraping():
             pay =  pay.text.split("\n")
             extra_info = extra_info.text.split("\n")
 
-            job_title = role[0][9:]
+            job_title = role[0][10:]
             other_info = role[2][14:]
             employer = role[3][10:]
             fee = pay[0][15:]
             deadline = extra_info[2][18:]
 
             new_jobs.append(Job(venue= employer, job_title= job_title, link= job_listing, deadline= deadline, fee= fee, source= "Curtain Call", other_info= other_info))
+        driver.quit()
 
     # Open Hire does not have a website or an API. They only send out emails. We'll have to scrape their mail sent out.
     def Open_Hire():
@@ -174,6 +183,8 @@ def Web_Scraping():
     def The_Stage():
         print("Starting The Stage Jobs")
         # https://www.thestage.co.uk/jobs/theatre-vacancies This is ALL the vacancies on their website.
+
+        driver = start_driver()
 
         driver.get("https://www.thestage.co.uk/jobs/theatre-vacancies")
         time.sleep(1)
@@ -200,22 +211,33 @@ def Web_Scraping():
                 # Skips the first loop. This is so that if there were only 1 job listed on the site we wouldn't skip it.
                 add_links(p_elements)
             page += 1
-            driver.get(f"https://www.thestage.co.uk/jobs/theatre-vacancies?page={page}")
+            url = f"https://www.thestage.co.uk/jobs/theatre-vacancies?page={page}"
+            driver.get(url)
+            print(url)
             p_elements = driver.find_elements_by_class_name("job-container")[1:] # The first item in the list will
-            # always (I think always)
+            # always (I think always) be the same promoted item.
 
         print(f"{len(links)} jobs from The Stage")
         # print("Going through every individual job listing.")
         for c, job_listing in enumerate(links):
             driver.get(job_listing)
+            print(job_listing)
             if c == 0:
 
                 # Wait for cookies button to open, then selects basic cookies.
                 time.sleep(1)
-                driver.find_element_by_id("aos-Cookie-Modal-Accept").click()
+                try:
+                    driver.find_element_by_id("aos-Cookie-Modal-Accept").click()
+                except:
+                    try:
+                        driver.find_element_by_id("cookies-eu-accept").click()
+                    except:
+                        print("Couldn't accept cookies.")
+                        driver.save_screenshot("website.png")
+
 
                 # Put in our username and password to the login
-                time.sleep(1)
+                # time.sleep(1)
                 e = driver.find_element_by_id("aoLogin-email")
                 e.send_keys(email)
                 e = driver.find_element_by_id("aoLogin-password")
@@ -223,7 +245,8 @@ def Web_Scraping():
 
                 driver.find_element_by_id("aoLogin-Login").click()
 
-
+            driver.save_screenshot("website2.png")
+            time.sleep(1)
             info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
             # print(info)
             job_title = info[0]
@@ -236,6 +259,7 @@ def Web_Scraping():
 
 
             new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing[:-1], deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
+        driver.quit()
 
 
         pass
@@ -248,6 +272,8 @@ def Web_Scraping():
         # This site has a few animated things coming in
         # and out so we got a few sleeps just to be sure those items have animated out of our way.
         # The actual job pages also have very little in the way of formatting. :(
+
+        driver = start_driver()
 
         page = 1
         driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
@@ -292,7 +318,7 @@ def Web_Scraping():
             print("Hit an error on artsjobs.org.uk This was almost certainly due reaching the end of the jobs listed "
                   "on the main pages. We'll now go through each one individually.")
 
-        print(f"{len(all_links)} jobs from The Stage")
+        print(f"{len(all_links)} jobs from Arts Jobs")
         # Poor site formatting & standardisation here. Not gonna be much data we can consistantly get.
         for c, url in enumerate(all_links):
 
@@ -314,6 +340,8 @@ def Web_Scraping():
 
             if len(info) != 6:
                 print("Error. Not enough data found on page.")
+                print(url)
+                print(info)
                 continue
 
             deadline = info[0].text[6:]
@@ -329,7 +357,7 @@ def Web_Scraping():
             # print([venue,location,job_title,deadline,fee,contact])
 
             new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
-
+        driver.quit()
 
 
         print("Finished ArtsJobs.org.uk")
@@ -493,13 +521,16 @@ def Web_Scraping():
 
 
     # Choose which to run.
-    Curtain_Call()
-    # The_Stage()
+    print("Doing Curtain Call, The Stage and Arts Jobs")
+
+    # We run items which need to be run NOT in headless mode FIRST.
+
+    The_Stage()
     # Arts_Jobs()
+    # Curtain_Call()
+
     # Facebook()
 
-    # Ensure we quit at the end, no matter what happens previously.
-    driver.quit()
 
 
     return new_jobs
