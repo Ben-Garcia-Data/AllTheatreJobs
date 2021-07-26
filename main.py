@@ -41,19 +41,20 @@ def Web_Scraping():
 
     from selenium.webdriver import Chrome
     # print("Imported Chrome")
-    chrome_options = ChromeOptions()
 
-    def SetDriverOptions(headless = False):
-        if headless:
-            chrome_options.add_argument('--headless')
+
+    def SetDriverOptions():
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        return chrome_options
 
     from sys import platform
     print(f"Looks like we're running on {platform}")
 
     def start_driver():
-        SetDriverOptions()
+        chrome_options = SetDriverOptions()
         if "win" in platform:
             driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
         elif "linux" in platform:
