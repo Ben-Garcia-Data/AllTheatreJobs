@@ -264,7 +264,7 @@ def Web_Scraping():
 
 
 
-            new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing[:-1], deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
+            new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing, deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
         driver.quit()
 
 
@@ -516,9 +516,9 @@ def Web_Scraping():
 
     # We run items which need to be run NOT in headless mode FIRST.
 
-    # The_Stage()
+    The_Stage()
     Arts_Jobs()
-    # Curtain_Call()
+    Curtain_Call()
 
     # Facebook()
 
@@ -538,7 +538,7 @@ def store_data(data):
     try:
         df1.to_csv("JobsData.csv", index=False)
     except:
-        print("Error recording all these jobs")
+        print("Error recording all these jobs as CSV")
         time.sleep(30)
         df1.to_csv("JobsData.csv", index=False)
 
