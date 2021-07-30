@@ -80,7 +80,7 @@ def Web_Scraping():
     def SetDriverOptions():
         userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36'
         chrome_options = ChromeOptions()
-        chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument(f'--user-agent={userAgent}')
@@ -101,6 +101,15 @@ def Web_Scraping():
         else:
             print("Unknown platform")
 
+        return driver
+
+    def restart_driver(driver):
+        print("Restarting driver")
+        u = driver.current_url
+        driver.quit()
+        driver = start_driver()
+        driver.get(u)
+        print("Driver restarted")
         return driver
 
     password = get_login_details()["password"]
@@ -152,6 +161,8 @@ def Web_Scraping():
 
         time.sleep(1)
 
+        print(CCpassword,email)
+
         driver.find_element_by_id("id_login").send_keys(email)
         driver.find_element_by_id("id_password").send_keys(CCpassword)
         driver.find_element_by_id("hs-eu-confirmation-button").click()
@@ -191,9 +202,9 @@ def Web_Scraping():
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
-            time.sleep(0.1)
             print(f"{job_listing}")
             driver.get(job_listing)
+            time.sleep(0.1)
 
             role = driver.find_element_by_id("role")
             pay = driver.find_element_by_id("payment")
@@ -335,11 +346,14 @@ def Web_Scraping():
 
         driver = start_driver()
 
+        def CCCookies():
+            time.sleep(1.5)
+            driver.find_element_by_id("ccc-reject-settings").click()
+            time.sleep(0.2)
+
         page = 1
         driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
-        time.sleep(1.5)
-        driver.find_element_by_id("ccc-reject-settings").click()
-        time.sleep(0.2)
+        CCCookies()
 
         # use to select "Theatre" as the artform (Not needed & not working)
         # checkboxes = driver.find_elements_by_class_name("formCheckbox")
@@ -365,19 +379,16 @@ def Web_Scraping():
 
         while len(p_elements) > 0:
 
-
-
             for i in p_elements:
                 link = i.find_element_by_tag_name("a").get_attribute("href")
                 # print(link)
                 all_links.append(link)
 
 
-            if page % 10 == 0:
-                print("Restarting driver")
-                driver.quit()
-                driver = start_driver()
-                print("Driver restarted")
+            if page % 30 == 0:
+                driver = restart_driver(driver)
+                CCCookies()
+
 
             page += 1
             print(f"Going to page {page}")
@@ -388,10 +399,12 @@ def Web_Scraping():
         print(f"{len(all_links)} jobs from Arts Jobs")
         # Poor site formatting & standardisation here. Not gonna be much data we can consistantly get.
 
+        driver = restart_driver(driver)
+        CCCookies()
 
         for c, url in enumerate(all_links):
 
-            if c % 10 == 0:
+            if c % 50 == 0:
                 print("Restarting driver")
                 driver.quit()
                 driver = start_driver()
@@ -587,14 +600,10 @@ def Web_Scraping():
         pass
 
 
-    # Choose which to run.
-    print("Doing Curtain Call, The Stage and Arts Jobs")
-
-    # We run items which need to be run NOT in headless mode FIRST.
 
     # The_Stage()
-    Arts_Jobs()
-    # Curtain_Call()
+    # Arts_Jobs()
+    Curtain_Call()
 
     # Facebook()
 
@@ -621,6 +630,8 @@ def store_data(data):
     mydb = start_db_connection()
 
     from sqlalchemy import create_engine
+    sqlUsername = get_login_details()["sqlUsername"]
+    sqlPassword = get_login_details()["sqlPassword"]
     engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
 
     mycursor = mydb.cursor()
