@@ -130,3 +130,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/website.png
+/website2.png
+/TEST DATA JobsData.csv
+/JobsData.csv
