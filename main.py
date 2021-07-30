@@ -44,10 +44,12 @@ def Web_Scraping():
 
 
     def SetDriverOptions():
+        userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36'
         chrome_options = ChromeOptions()
-        # chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument(f'--user-agent={userAgent}')
         return chrome_options
 
     from sys import platform
@@ -56,7 +58,10 @@ def Web_Scraping():
     def start_driver():
         chrome_options = SetDriverOptions()
         if "win" in platform:
-            driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
+            try:
+                driver = Chrome(options = chrome_options,executable_path = r"C:\Users\PC\Downloads\chromedriver_win32\chromedriver.exe")
+            except:
+                driver = Chrome(options=chrome_options, executable_path=r"C:\Users\ben\Downloads\chromedriver_win32\chromedriver.exe")
         elif "linux" in platform:
             driver = Chrome(options=chrome_options)
         else:
@@ -219,6 +224,7 @@ def Web_Scraping():
         # print("Going through every individual job listing.")
         for c, job_listing in enumerate(links):
             driver.get(job_listing)
+            # driver.save_screenshot("FirstPage.png")
             print(str(100 * c/len(links))[:4] + "%",job_listing)
             if c == 0:
 
@@ -231,35 +237,43 @@ def Web_Scraping():
                         driver.find_element_by_id("cookies-eu-accept").click()
                     except:
                         print("Couldn't accept cookies.")
+                        # driver.save_screenshot("nocookies.png")
 
 
                 # Put in our username and password to the login
 
+                # FIXED on 30/07/21 at 21:18
                 # If we are using headless mode, this will cause an error when logging in.
-                # If we aren't using headless mode, we are unable to start the driver.
+                # If we aren't using headless mode, we are unable to start the driver when in Linux
 
+                # WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "aoLogin-email"))).click()
                 time.sleep(1)
-
                  
                 try:
                     e = driver.find_element_by_id("aoLogin-email")
                     e.send_keys(email)
+                    # driver.save_screenshot("email.png")
                     e = driver.find_element_by_id("aoLogin-password")
                     e.send_keys(password)
+                    # driver.save_screenshot("password.png")
 
                     driver.find_element_by_id("aoLogin-Login").click()
+                    # driver.save_screenshot("button.png")
                 except:
                     print("Error logging in. waiting 30 secs for manual help.")
+                    # driver.save_screenshot("Cant login.png")
                     time.sleep(30)
 
             # driver.save_screenshot("website2.png")
 
 
-            time.sleep(1)
             try:
                 info = driver.find_element_by_class_name("job-result-preview").text.split("\n")
             except:
-                print("Error finding first job. We probably failed to login.")
+
+                print("Error finding first job. We probably failed to login. Taking a screenshot")
+                # driver.save_screenshot("debug.png")
+
             # print(info)
             job_title = info[0]
             venue = info[1]
@@ -548,7 +562,7 @@ def store_data(data):
         time.sleep(30)
         df1.to_csv("JobsData.csv", index=False)
 
-    import mysql.connector
+    import  mysql.connector
 
     sqlUsername = get_login_details()["sqlUsername"]
     sqlPassword = get_login_details()["sqlPassword"]
