@@ -103,8 +103,6 @@ def Web_Scraping():
 
         return driver
 
-
-
     password = get_login_details()["password"]
     CCpassword = get_login_details()['CurtainCallPassword']
     email = get_login_details()["username"]
@@ -339,7 +337,7 @@ def Web_Scraping():
 
         page = 1
         driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
-        time.sleep(2.5)
+        time.sleep(1.5)
         driver.find_element_by_id("ccc-reject-settings").click()
         time.sleep(0.2)
 
@@ -367,15 +365,20 @@ def Web_Scraping():
 
         while len(p_elements) > 0:
 
-            if len(p_elements) % 10 == 0:
-                print("Restarting driver")
-                driver.quit()
-                driver = start_driver()
+
 
             for i in p_elements:
                 link = i.find_element_by_tag_name("a").get_attribute("href")
                 # print(link)
                 all_links.append(link)
+
+
+            if page % 10 == 0:
+                print("Restarting driver")
+                driver.quit()
+                driver = start_driver()
+                print("Driver restarted")
+
             page += 1
             print(f"Going to page {page}")
             driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
