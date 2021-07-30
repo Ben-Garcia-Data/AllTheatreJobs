@@ -45,7 +45,7 @@ def Web_Scraping():
 
     def SetDriverOptions():
         chrome_options = ChromeOptions()
-        chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         return chrome_options
@@ -219,7 +219,7 @@ def Web_Scraping():
         # print("Going through every individual job listing.")
         for c, job_listing in enumerate(links):
             driver.get(job_listing)
-            print(job_listing)
+            print(str(100 * c/len(links))[:4] + "%",job_listing)
             if c == 0:
 
                 # Wait for cookies button to open, then selects basic cookies.
@@ -238,13 +238,19 @@ def Web_Scraping():
                 # If we are using headless mode, this will cause an error when logging in.
                 # If we aren't using headless mode, we are unable to start the driver.
 
-                # time.sleep(1)
-                e = driver.find_element_by_id("aoLogin-email")
-                e.send_keys(email)
-                e = driver.find_element_by_id("aoLogin-password")
-                e.send_keys(password)
+                time.sleep(1)
 
-                driver.find_element_by_id("aoLogin-Login").click()
+                 
+                try:
+                    e = driver.find_element_by_id("aoLogin-email")
+                    e.send_keys(email)
+                    e = driver.find_element_by_id("aoLogin-password")
+                    e.send_keys(password)
+
+                    driver.find_element_by_id("aoLogin-Login").click()
+                except:
+                    print("Error logging in. waiting 30 secs for manual help.")
+                    time.sleep(30)
 
             # driver.save_screenshot("website2.png")
 
@@ -283,7 +289,7 @@ def Web_Scraping():
 
         page = 1
         driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
-        time.sleep(0.5)
+        time.sleep(2.5)
         driver.find_element_by_id("ccc-reject-settings").click()
         time.sleep(0.2)
 
@@ -329,7 +335,7 @@ def Web_Scraping():
         for c, url in enumerate(all_links):
 
             # print(f"link {c}")
-            print(url)
+            print(str(100 * c/len(all_links))[:4] + "%",url)
 
             driver.get(url)
             try:
