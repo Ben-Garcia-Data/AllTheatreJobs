@@ -32,6 +32,7 @@ date = datetime.date.today().strftime(("%d_%M_%Y"))
 tableName = f"{date}_JOBS"
 
 def start_db_connection():
+    print("Starting DB connection")
 
     def make_Connector():
 
@@ -56,6 +57,7 @@ def start_db_connection():
     mydb = make_Connector()
     make_table(mydb)
 
+    print(f"Connected to DB: {tableName}")
     return mydb
 
 
@@ -422,7 +424,8 @@ def Web_Scraping():
             # new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
 
             # Columns Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo
-            mydb.cursor().execute(f"INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ({location}, {job_title}, {deadline}, {venue}, {fee}, ArtsJobs.org.uk, Contact_{contact} )")
+            print(f'INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ("{location}", "{job_title}", "{url}", "{deadline}", "{venue}", "{fee}", "ArtsJobs.org.uk", "Contact_{contact}")')
+            mydb.cursor().execute(f'INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ("{location}", "{job_title}", "{url}", "{deadline}", "{venue}", "{fee}", "ArtsJobs.org.uk", "Contact_{contact}")')
 
 
         driver.quit()
