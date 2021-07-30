@@ -237,12 +237,12 @@ def Web_Scraping():
                         driver.find_element_by_id("cookies-eu-accept").click()
                     except:
                         print("Couldn't accept cookies.")
-                        # driver.save_screenshot("nocookies.png")
+                        driver.save_screenshot("nocookies.png")
 
 
                 # Put in our username and password to the login
 
-                # FIXED on 30/07/21 at 21:18
+                # Partially FIXED on 30/07/21 at 21:18
                 # If we are using headless mode, this will cause an error when logging in.
                 # If we aren't using headless mode, we are unable to start the driver when in Linux
 
@@ -258,10 +258,10 @@ def Web_Scraping():
                     # driver.save_screenshot("password.png")
 
                     driver.find_element_by_id("aoLogin-Login").click()
-                    # driver.save_screenshot("button.png")
+                    driver.save_screenshot("login.png")
                 except:
                     print("Error logging in. waiting 30 secs for manual help.")
-                    # driver.save_screenshot("Cant login.png")
+                    driver.save_screenshot("Cant login.png")
                     time.sleep(30)
 
             # driver.save_screenshot("website2.png")
@@ -272,7 +272,7 @@ def Web_Scraping():
             except:
 
                 print("Error finding first job. We probably failed to login. Taking a screenshot")
-                # driver.save_screenshot("debug.png")
+                driver.save_screenshot("debug.png")
 
             # print(info)
             job_title = info[0]
