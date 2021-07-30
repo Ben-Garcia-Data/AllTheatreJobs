@@ -110,7 +110,7 @@ def Web_Scraping():
     email = get_login_details()["username"]
     fb_token = get_login_details()["fb_token"]
 
-    # new_jobs = []
+    new_jobs = []
 
     # new_jobs.append(Job(venue= , location= , job_title= , link= , deadline= , fee= , source= , other_info= ))
 
@@ -367,6 +367,11 @@ def Web_Scraping():
             # Maybe look for the "next" element?
 
             while len(p_elements) > 0:
+
+                if len(p_elements) % 10 == 0:
+                    driver.quit()
+                    driver = start_driver()
+
                 for i in p_elements:
                     link = i.find_element_by_tag_name("a").get_attribute("href")
                     # print(link)
@@ -382,7 +387,13 @@ def Web_Scraping():
 
         print(f"{len(all_links)} jobs from Arts Jobs")
         # Poor site formatting & standardisation here. Not gonna be much data we can consistantly get.
+
+
         for c, url in enumerate(all_links):
+
+            if c % 10 == 0:
+                driver.quit()
+                driver = start_driver()
 
             # print(f"link {c}")
             print(str(100 * c/len(all_links))[:4] + "%",url)
@@ -421,11 +432,11 @@ def Web_Scraping():
 
 
 
-            # new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
+            new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
 
             # Columns Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo
-            print(f'INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ("{location}", "{job_title}", "{url}", "{deadline}", "{venue}", "{fee}", "ArtsJobs.org.uk", "Contact_{contact}")')
-            mydb.cursor().execute(f'INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ("{location}", "{job_title}", "{url}", "{deadline}", "{venue}", "{fee}", "ArtsJobs.org.uk", "Contact_{contact}")')
+            # print(f'INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ("{location}", "{job_title}", "{url}", "{deadline}", "{venue}", "{fee}", "ArtsJobs.org.uk", "Contact_{contact}")')
+            # mydb.cursor().execute(f'INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ("{location}", "{job_title}", "{url}", "{deadline}", "{venue}", "{fee}", "ArtsJobs.org.uk", "Contact_{contact}")')
 
 
         driver.quit()
@@ -604,6 +615,28 @@ def store_data(data):
         print("Error recording all these jobs as CSV")
         time.sleep(30)
         df1.to_csv("JobsData.csv", index=False)
+
+
+    mydb = start_db_connection()
+
+    from sqlalchemy import create_engine
+    engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
+
+    mycursor = mydb.cursor()
+
+    import datetime
+    date = datetime.date.today().strftime(("%d_%M_%Y"))
+
+    tableName = f"{date}_JOBS"
+
+    df1.to_sql(tableName, con=engine, if_exists='replace', index=False)
+
+    mycursor.execute(f'SELECT * FROM {tableName}')
+
+    for row in mycursor.fetchall():
+        print(row)
+
+    mydb.close()
 
 
 
