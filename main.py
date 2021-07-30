@@ -114,7 +114,7 @@ def Web_Scraping():
 
     # new_jobs.append(Job(venue= , location= , job_title= , link= , deadline= , fee= , source= , other_info= ))
 
-    mydb = start_db_connection()
+    # mydb = start_db_connection()
 
     def Mandy():
         # Unlimited premium using dupe accounts?
@@ -362,28 +362,25 @@ def Web_Scraping():
         all_links = []
 
         print("Cycling through all the pages of job entires.")
-        try:
-            # Would be better to replace with try with the while and a test to check if I can go to the next page.
-            # Maybe look for the "next" element?
+        # Would be better to replace with try with the while and a test to check if I can go to the next page.
+        # Maybe look for the "next" element?
 
-            while len(p_elements) > 0:
+        while len(p_elements) > 0:
 
-                if len(p_elements) % 10 == 0:
-                    driver.quit()
-                    driver = start_driver()
+            if len(p_elements) % 10 == 0:
+                print("Restarting driver")
+                driver.quit()
+                driver = start_driver()
 
-                for i in p_elements:
-                    link = i.find_element_by_tag_name("a").get_attribute("href")
-                    # print(link)
-                    all_links.append(link)
-                page += 1
-                print(f"Going to page {page}")
-                driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
-                p_elements = driver.find_element_by_class_name("aj-listing").find_elements_by_tag_name("li")
+            for i in p_elements:
+                link = i.find_element_by_tag_name("a").get_attribute("href")
+                # print(link)
+                all_links.append(link)
+            page += 1
+            print(f"Going to page {page}")
+            driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
+            p_elements = driver.find_element_by_class_name("aj-listing").find_elements_by_tag_name("li")
 
-        except:
-            print("Hit an error on artsjobs.org.uk This was almost certainly due reaching the end of the jobs listed "
-                  "on the main pages. We'll now go through each one individually.")
 
         print(f"{len(all_links)} jobs from Arts Jobs")
         # Poor site formatting & standardisation here. Not gonna be much data we can consistantly get.
@@ -392,6 +389,7 @@ def Web_Scraping():
         for c, url in enumerate(all_links):
 
             if c % 10 == 0:
+                print("Restarting driver")
                 driver.quit()
                 driver = start_driver()
 
@@ -643,8 +641,7 @@ def store_data(data):
     # Test commit 3
 
 
-Web_Scraping()
-mydb.close()
+store_data(Web_Scraping())
 
 # Filtering
 # Upload to Google docs
