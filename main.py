@@ -1,4 +1,5 @@
 import time
+import pandas
 
 # Test commit 2
 
@@ -25,6 +26,37 @@ def get_login_details():
     f = open(file_name, "r")
     j = json.load(f)
     return j
+
+import datetime
+date = datetime.date.today().strftime(("%d_%M_%Y"))
+tableName = f"{date}_JOBS"
+
+def start_db_connection():
+
+    def make_Connector():
+
+        import mysql.connector
+        sqlUsername = get_login_details()["sqlUsername"]
+        sqlPassword = get_login_details()["sqlPassword"]
+        dbName = "TheatreJobs"
+
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user=sqlUsername,
+            password=sqlPassword,
+            database=dbName
+        )
+        return mydb
+
+    def make_table(mydb):
+        mycursor = mydb.cursor()
+        mycursor.execute("USE TheatreJobs")
+        mycursor.execute(f"CREATE TABLE {tableName} (id INT AUTO_INCREMENT PRIMARY KEY, Location VARCHAR(255), JobTitle VARCHAR(255), Link VARCHAR(255), Deadline VARCHAR(255), Venue VARCHAR(255), Fee VARCHAR(255), Source VARCHAR(255), OtherInfo VARCHAR(255))")
+
+    mydb = make_Connector()
+    make_table(mydb)
+
+    return mydb
 
 
 def Web_Scraping():
@@ -76,9 +108,11 @@ def Web_Scraping():
     email = get_login_details()["username"]
     fb_token = get_login_details()["fb_token"]
 
-    new_jobs = []
+    # new_jobs = []
 
     # new_jobs.append(Job(venue= , location= , job_title= , link= , deadline= , fee= , source= , other_info= ))
+
+    mydb = start_db_connection()
 
     def Mandy():
         # Unlimited premium using dupe accounts?
@@ -383,7 +417,14 @@ def Web_Scraping():
 
             # print([venue,location,job_title,deadline,fee,contact])
 
-            new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
+
+
+            # new_jobs.append(Job(venue= venue, location= location, job_title= job_title, link=url[:-1], deadline= deadline, fee=fee, source="ArtsJobs.org.uk", other_info=f"Contact: {contact}"))
+
+            # Columns Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo
+            mydb.cursor().execute(f"INSERT INTO {tableName}(Location, JobTitle, Link, Deadline, Venue, Fee, Source, OtherInfo) VALUES ({location}, {job_title}, {deadline}, {venue}, {fee}, ArtsJobs.org.uk, Contact_{contact} )")
+
+
         driver.quit()
 
 
@@ -536,9 +577,9 @@ def Web_Scraping():
 
     # We run items which need to be run NOT in headless mode FIRST.
 
-    The_Stage()
+    # The_Stage()
     Arts_Jobs()
-    Curtain_Call()
+    # Curtain_Call()
 
     # Facebook()
 
@@ -549,7 +590,6 @@ def Web_Scraping():
 
 
 def store_data(data):
-    import pandas
     df1 = pandas.DataFrame([x.__dict__ for x in data])
 
     pandas.set_option('display.max_columns', 500)
@@ -562,41 +602,13 @@ def store_data(data):
         time.sleep(30)
         df1.to_csv("JobsData.csv", index=False)
 
-    import  mysql.connector
 
-    sqlUsername = get_login_details()["sqlUsername"]
-    sqlPassword = get_login_details()["sqlPassword"]
-    dbName = "TheatreJobs"
-
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user=sqlUsername,
-        password=sqlPassword,
-        database=dbName
-    )
-
-    from sqlalchemy import create_engine
-    engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
-
-    mycursor = mydb.cursor()
-
-    import datetime
-    date = datetime.date.today().strftime(("%d_%M_%Y"))
-
-    tableName = f"{date}_JOBS"
-
-    df1.to_sql(tableName, con=engine,if_exists='replace',index=False)
-
-    mycursor.execute(f'SELECT * FROM {tableName}')
-
-    for row in mycursor.fetchall():
-        print(row)
-
-    mydb.close()
 
     # Test commit 3
 
 
-store_data(Web_Scraping())
+Web_Scraping()
+mydb.close()
+
 # Filtering
 # Upload to Google docs
