@@ -611,7 +611,19 @@ def Web_Scraping():
 
     return new_jobs
 
+def checkTableExists(dbcon, tablename):
+    dbcur = dbcon.cursor()
+    dbcur.execute("""
+        SELECT COUNT(*)
+        FROM information_schema.tables
+        WHERE table_name = '{0}'
+        """.format(tablename.replace('\'', '\'\'')))
+    if dbcur.fetchone()[0] == 1:
+        dbcur.close()
+        return True
 
+    dbcur.close()
+    return False
 
 def store_data(data):
     df1 = pandas.DataFrame([x.__dict__ for x in data])
@@ -632,6 +644,7 @@ def store_data(data):
     from sqlalchemy import create_engine
     sqlUsername = get_login_details()["sqlUsername"]
     sqlPassword = get_login_details()["sqlPassword"]
+    dbName = "TheatreJobs"
     engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
 
     mycursor = mydb.cursor()
