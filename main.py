@@ -161,8 +161,6 @@ def Web_Scraping():
 
         time.sleep(1)
 
-        print(CCpassword,email)
-
         driver.find_element_by_id("id_login").send_keys(email)
         driver.find_element_by_id("id_password").send_keys(CCpassword)
         driver.find_element_by_id("hs-eu-confirmation-button").click()
@@ -645,7 +643,7 @@ def store_data(data):
     sqlUsername = get_login_details()["sqlUsername"]
     sqlPassword = get_login_details()["sqlPassword"]
     dbName = "TheatreJobs"
-    # engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
+    engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
 
     mycursor = mydb.cursor()
 
@@ -654,7 +652,7 @@ def store_data(data):
 
     tableName = f"{date}_JOBS"
 
-    df1.to_sql(tableName, con=mydb, if_exists='replace', index=False)
+    df1.to_sql(tableName, con=engine, if_exists='replace', index=False)
 
     mycursor.execute(f'SELECT * FROM {tableName}')
 
