@@ -1,6 +1,8 @@
 # Login file
 config.txt
 
+GoogleKey
+
 # venv Pycharm
 .idea/
 venv/

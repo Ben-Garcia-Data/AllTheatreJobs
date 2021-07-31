@@ -1,6 +1,7 @@
 import time
 import pandas
 
+
 # Test commit 2
 
 class Job():
@@ -219,10 +220,6 @@ def Web_Scraping():
             new_jobs.append(Job(venue= employer, job_title= job_title, link= job_listing, deadline= deadline, fee= fee, source= "Curtain Call", other_info= other_info))
         driver.quit()
 
-    # Open Hire does not have a website or an API. They only send out emails. We'll have to scrape their mail sent out.
-    def Open_Hire():
-        pass
-
     # DONE Uses a login & password stored in enviroment variables.
     def The_Stage():
         print("Starting The Stage Jobs")
@@ -323,9 +320,6 @@ def Web_Scraping():
 
             new_jobs.append(Job(venue=venue, location=location, job_title=job_title, link=job_listing, deadline=deadline, fee=fee, source="The Stage Jobs", other_info=other_info))
         driver.quit()
-
-
-        pass
 
     # Functionally complete, altho could use a little neatening up in 1 place.
     def Arts_Jobs():
@@ -445,7 +439,6 @@ def Web_Scraping():
 
 
         print("Finished ArtsJobs.org.uk")
-        pass
 
     # Scrape 1 single Facebook group
     def Facebook():
@@ -589,9 +582,9 @@ def Web_Scraping():
 
 
 
-    Arts_Jobs()
+    # Arts_Jobs()
     Curtain_Call()
-    The_Stage()
+    # The_Stage()
 
     # Facebook()
 
@@ -599,32 +592,16 @@ def Web_Scraping():
 
     return new_jobs
 
-def checkTableExists(dbcon, tablename):
-    dbcur = dbcon.cursor()
-    dbcur.execute("""
-        SELECT COUNT(*)
-        FROM information_schema.tables
-        WHERE table_name = '{0}'
-        """.format(tablename.replace('\'', '\'\'')))
-    if dbcur.fetchone()[0] == 1:
-        dbcur.close()
-        return True
-
-    dbcur.close()
-    return False
-
 def store_data(data):
     df1 = pandas.DataFrame([x.__dict__ for x in data])
 
-    pandas.set_option('display.max_columns', 500)
-
     # print(df1)
-    try:
+    """try:
         df1.to_csv("JobsData.csv", index=False)
     except:
         print("Error recording all these jobs as CSV")
         time.sleep(30)
-        df1.to_csv("JobsData.csv", index=False)
+        df1.to_csv("JobsData.csv", index=False)"""
 
 
     mydb = start_db_connection()
@@ -652,11 +629,19 @@ def store_data(data):
     mydb.close()
 
 
+def upload_data(data):
+    df1 = pandas.DataFrame([x.__dict__ for x in data])
+    import gspread
+    gc = gspread.service_account()
+    sh = gc.open('TheatreJobsUpload')
+    worksheet = sh.get_worksheet(0)
+    worksheet.update("A3:H",[df1.columns.values.tolist()] + df1.values.tolist())
+    worksheet.update("B1",datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
 
-    # Test commit 3
+d = Web_Scraping()
+store_data(d)
+upload_data(d)
 
-
-# store_data(Web_Scraping())
 
 # Filtering
 # Upload to Google docs
