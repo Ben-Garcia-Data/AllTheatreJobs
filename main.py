@@ -28,7 +28,7 @@ def get_login_details():
     return j
 
 import datetime
-date = datetime.date.today().strftime(("%d_%M_%Y"))
+date = datetime.date.today().strftime(("%d_%m_%Y"))
 tableName = f"{date}_JOBS"
 
 def start_db_connection():
@@ -656,7 +656,7 @@ def store_data(data):
     # Test commit 3
 
 
-store_data(Web_Scraping())
+# store_data(Web_Scraping())
 
 # Filtering
 # Upload to Google docs
