@@ -80,7 +80,7 @@ def Web_Scraping():
     def SetDriverOptions():
         userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36'
         chrome_options = ChromeOptions()
-        chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument(f'--user-agent={userAgent}')
@@ -120,8 +120,6 @@ def Web_Scraping():
     new_jobs = []
 
     # new_jobs.append(Job(venue= , location= , job_title= , link= , deadline= , fee= , source= , other_info= ))
-
-    # mydb = start_db_connection()
 
     def Mandy():
         # Unlimited premium using dupe accounts?
@@ -248,6 +246,35 @@ def Web_Scraping():
                 # print(link)
                 links.append(link)
 
+
+        def TSCookies():
+            time.sleep(3)
+            try:
+                driver.find_element_by_id("aos-Cookie-Modal-Accept").click()
+            except:
+                try:
+                    driver.find_element_by_id("cookies-eu-accept").click()
+                except:
+                    print("Couldn't accept cookies.")
+                    driver.save_screenshot("nocookies.png")
+
+            time.sleep(1)
+
+            try:
+                e = driver.find_element_by_id("aoLogin-email")
+                e.send_keys(email)
+                # driver.save_screenshot("email.png")
+                e = driver.find_element_by_id("aoLogin-password")
+                e.send_keys(password)
+                # driver.save_screenshot("password.png")
+
+                driver.find_element_by_id("aoLogin-Login").click()
+                driver.save_screenshot("login.png")
+            except:
+                print("Error logging in. waiting 30 secs for manual help.")
+                driver.save_screenshot("Cant login.png")
+                time.sleep(30)
+
         page = 1
         add_links(p_elements)
         # Iterate through every page of job ads. There will always be 1 job ad on each page bcus of the 'hot job' top
@@ -270,44 +297,11 @@ def Web_Scraping():
             # driver.save_screenshot("FirstPage.png")
             print(str(100 * c/len(links))[:4] + "%",job_listing)
             if c == 0:
+                TSCookies()
 
-                # Wait for cookies button to open, then selects basic cookies.
-                time.sleep(1)
-                try:
-                    driver.find_element_by_id("aos-Cookie-Modal-Accept").click()
-                except:
-                    try:
-                        driver.find_element_by_id("cookies-eu-accept").click()
-                    except:
-                        print("Couldn't accept cookies.")
-                        driver.save_screenshot("nocookies.png")
-
-
-                # Put in our username and password to the login
-
-                # Partially FIXED on 30/07/21 at 21:18
-                # If we are using headless mode, this will cause an error when logging in.
-                # If we aren't using headless mode, we are unable to start the driver when in Linux
-
-                # WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "aoLogin-email"))).click()
-                time.sleep(1)
-                 
-                try:
-                    e = driver.find_element_by_id("aoLogin-email")
-                    e.send_keys(email)
-                    # driver.save_screenshot("email.png")
-                    e = driver.find_element_by_id("aoLogin-password")
-                    e.send_keys(password)
-                    # driver.save_screenshot("password.png")
-
-                    driver.find_element_by_id("aoLogin-Login").click()
-                    driver.save_screenshot("login.png")
-                except:
-                    print("Error logging in. waiting 30 secs for manual help.")
-                    driver.save_screenshot("Cant login.png")
-                    time.sleep(30)
 
             # driver.save_screenshot("website2.png")
+
 
 
             try:
@@ -397,15 +391,11 @@ def Web_Scraping():
         print(f"{len(all_links)} jobs from Arts Jobs")
         # Poor site formatting & standardisation here. Not gonna be much data we can consistantly get.
 
-        driver = restart_driver(driver)
-        CCCookies()
-
         for c, url in enumerate(all_links):
 
             if c % 50 == 0:
-                print("Restarting driver")
-                driver.quit()
-                driver = start_driver()
+                driver = restart_driver(driver)
+                CCCookies()
 
             # print(f"link {c}")
             print(str(100 * c/len(all_links))[:4] + "%",url)
@@ -599,9 +589,9 @@ def Web_Scraping():
 
 
 
-    # The_Stage()
-    # Arts_Jobs()
+    Arts_Jobs()
     Curtain_Call()
+    The_Stage()
 
     # Facebook()
 
