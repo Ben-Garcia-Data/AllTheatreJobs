@@ -582,9 +582,9 @@ def Web_Scraping():
 
 
 
-    # Arts_Jobs()
+    Arts_Jobs()
     Curtain_Call()
-    # The_Stage()
+    The_Stage()
 
     # Facebook()
 
@@ -621,15 +621,11 @@ def store_data(data):
 
     df1.to_sql(tableName, con=engine, if_exists='replace', index=False)
 
-    mycursor.execute(f'SELECT * FROM {tableName}')
-
-    for row in mycursor.fetchall():
-        print(row)
-
     mydb.close()
 
 
 def upload_data(data):
+    print("Uploading data")
     df1 = pandas.DataFrame([x.__dict__ for x in data])
     import gspread
     gc = gspread.service_account()
@@ -637,6 +633,7 @@ def upload_data(data):
     worksheet = sh.get_worksheet(0)
     worksheet.update("A3:H",[df1.columns.values.tolist()] + df1.values.tolist())
     worksheet.update("B1",datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+    print("Data uploaded")
 
 d = Web_Scraping()
 store_data(d)
