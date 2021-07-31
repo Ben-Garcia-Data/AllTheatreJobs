@@ -55,7 +55,7 @@ def start_db_connection():
         mycursor.execute(f"CREATE TABLE {tableName} (id INT AUTO_INCREMENT PRIMARY KEY, Location VARCHAR(255), JobTitle VARCHAR(255), Link VARCHAR(255), Deadline VARCHAR(255), Venue VARCHAR(255), Fee VARCHAR(255), Source VARCHAR(255), OtherInfo VARCHAR(255))")
 
     mydb = make_Connector()
-    make_table(mydb)
+    # make_table(mydb)
 
     print(f"Connected to DB: {tableName}")
     return mydb
