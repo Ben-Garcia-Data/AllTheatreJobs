@@ -612,7 +612,7 @@ def store_data(data):
     dbName = "TheatreJobs"
     engine = create_engine(f'mysql://{sqlUsername}:{sqlPassword}@localhost/{dbName}')
 
-    mycursor = mydb.cursor()
+    # mycursor = mydb.cursor()
 
     import datetime
     date = datetime.date.today().strftime(("%d_%M_%Y"))
@@ -631,6 +631,7 @@ def upload_data(data):
     gc = gspread.service_account()
     sh = gc.open('TheatreJobsUpload')
     worksheet = sh.get_worksheet(0)
+    worksheet.values_clear("A3:H")
     worksheet.update("A3:H",[df1.columns.values.tolist()] + df1.values.tolist())
     worksheet.update("B1",datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
     print("Data uploaded")
