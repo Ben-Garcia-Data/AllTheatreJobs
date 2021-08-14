@@ -1,6 +1,9 @@
 # Login file
 config.txt
 
+# This shouldn't end up in this directory but *jus* in case since it's my Google key.
+service_account.json
+
 GoogleKey
 
 # venv Pycharm
