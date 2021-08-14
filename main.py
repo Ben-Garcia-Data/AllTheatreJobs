@@ -643,7 +643,7 @@ def upload_data(data):
     print("Data uploaded")
 
 d = Web_Scraping()
-#store_data(d)
+store_data(d)
 upload_data(d)
 
 
