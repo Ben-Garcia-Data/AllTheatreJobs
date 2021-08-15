@@ -651,7 +651,7 @@ def upload_data(data):
     print("Uploading data")
     if len(data) < 3000:
         extra_rows_needed = 3000 - len(data)
-        blank_row = Job()
+        blank_row = Job(venue= "", location= "", job_title= "", link= "", deadline= "", fee= "", source="" , other_info= "")
         data.extend([blank_row for i in range(extra_rows_needed)])
 
     df1 = pandas.DataFrame([x.__dict__ for x in data])
