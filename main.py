@@ -31,6 +31,7 @@ def get_login_details():
 import datetime
 date = datetime.date.today().strftime(("%d_%m_%Y"))
 tableName = f"{date}_JOBS"
+debug = False
 
 def start_db_connection():
     print("Starting DB connection")
@@ -88,7 +89,8 @@ def Web_Scraping():
         return chrome_options
 
     from sys import platform
-    print(f"Looks like we're running on {platform}")
+    if debug:
+        print(f"Looks like we're running on {platform}")
 
     def start_driver():
         chrome_options = SetDriverOptions()
@@ -105,12 +107,14 @@ def Web_Scraping():
         return driver
 
     def restart_driver(driver):
-        print("Restarting driver")
+        if debug:
+            print("Restarting driver")
         u = driver.current_url
         driver.quit()
         driver = start_driver()
         driver.get(u)
-        print("Driver restarted")
+        if debug:
+            print("Driver restarted")
         return driver
 
     password = get_login_details()["password"]
@@ -199,7 +203,8 @@ def Web_Scraping():
 
         # Iterate through each job listing, loading a new page each time.
         for job_listing in results:
-            print(f"{job_listing}")
+            if debug:
+                print(f"{job_listing}")
             driver.get(job_listing)
             time.sleep(0.1)
 
@@ -283,16 +288,19 @@ def Web_Scraping():
             page += 1
             url = f"https://www.thestage.co.uk/jobs/theatre-vacancies?page={page}"
             driver.get(url)
-            print(url)
+            if debug:
+                print(url)
             p_elements = driver.find_elements_by_class_name("job-container")[1:] # The first item in the list will
             # always (I think always) be the same promoted item.
 
         print(f"{len(links)} jobs from The Stage")
         # print("Going through every individual job listing.")
         for c, job_listing in enumerate(links):
+            time.sleep(1)
             driver.get(job_listing)
             # driver.save_screenshot("FirstPage.png")
-            print(str(100 * c/len(links))[:4] + "%",job_listing)
+            if debug:
+                print(str(100 * c/len(links))[:4] + "%",job_listing)
             if c == 0:
                 TSCookies()
 
@@ -358,8 +366,8 @@ def Web_Scraping():
         p_elements = driver.find_element_by_class_name("aj-listing").find_elements_by_tag_name("li")
 
         all_links = []
-
-        print("Cycling through all the pages of job entires.")
+        if debug:
+            print("Cycling through all the pages of job entires.")
         # Would be better to replace with try with the while and a test to check if I can go to the next page.
         # Maybe look for the "next" element?
 
@@ -377,7 +385,8 @@ def Web_Scraping():
 
 
             page += 1
-            print(f"Going to page {page}")
+            if debug:
+                print(f"Going to page {page}")
             driver.get(f"https://www.artsjobs.org.uk/arts-jobs-listings/?ne_jobs%5Bpage%5D={page}")
             p_elements = driver.find_element_by_class_name("aj-listing").find_elements_by_tag_name("li")
 
@@ -392,7 +401,8 @@ def Web_Scraping():
                 CCCookies()
 
             # print(f"link {c}")
-            print(str(100 * c/len(all_links))[:4] + "%",url)
+            if debug:
+                print(str(100 * c/len(all_links))[:4] + "%",url)
 
             driver.get(url)
             try:
@@ -411,7 +421,7 @@ def Web_Scraping():
             if len(info) != 6:
                 print("Error. Not enough data found on page.")
                 print(url)
-                print(info)
+                # print(info)
                 continue
 
             deadline = info[0].text[6:]
@@ -581,10 +591,23 @@ def Web_Scraping():
         pass
 
 
+    try:
+        Arts_Jobs()
+    except Exception as err:
+        print(err)
+        print("Failed Arts Jobs")
 
-    Arts_Jobs()
-    Curtain_Call()
-    The_Stage()
+    try:
+        Curtain_Call()
+    except Exception as err:
+        print(err)
+        print("Failed Curtain Call")
+
+    try:
+        The_Stage()
+    except Exception as err:
+        print(err)
+        print("Failed The Stage")
 
     # Facebook()
 
