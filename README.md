@@ -1,14 +1,13 @@
 # AllTheatreJobs
-A web scraping tool for collating all backstage technical theatre jobs.
+A web scraping tool for collating all backstage technical theatre jobs. I have put this code onto the backburner now jobs are more abundant, I am busier and it is stably running on my server.
 
 The aim of this code is to create listings of job advertisments from the following sources:  
-Mandy  
-Curtain Call  
-Open Hire  
-The Stage  
-Arts Jobs  
-Twitter  
-Facebook (Backstage Theatre Jobs group)  
+Mandy           (Not happening due to legal issues)
+Curtain Call    ACTIVE
+Open Hire       Open Hire has no fixed formatting, API or website, so they are a little harder to do.
+The Stage       (The Stage has blocked me and won't answer any emails, so they are out)
+Arts Jobs       ACTIVE
+Facebook        (Backstage Theatre Jobs group)  (Group has been inactive)
 
 
 Then post this list of job ads onto twitter (by Tom Lightbody) with the following details:
@@ -22,30 +21,22 @@ LONDON: @NegEarthLights are looking for a MOVING LIGHT TECHNICIAN: https://twitt
 Anything still open with a closing date is reposted weekly. Anything without a closing date is only posted once.
 
 
-The steps will be:  
-Web scraping  
-Data collection, comparison, cleaning.  
-Automatic fortmatting  
-Manual review  
-Manual posting  
+This project involves: 
+Web scraping.
+Data collection, cleaning.
+Data storage.
+Accesible data access in Google Sheets
 
 The current setup is:  
   Data scraping using Selenium in Python  
   Data is cleaned and filtered.  
-  Data storage in an SQL Database on my personal server.  
+  Data storage in an SQL Database on my personal server.
+  Data is uploaded via Google's API to a Google Sheets doc where anyone can access it in a semi-readible format.
   
-Future additions to the setup will be:  
-  Automated removal of entries which have been seen before  
+Possible future additions to the setup could be:  
+  Automated removal of entries which have been seen before (and forgotten to be taken down)  
   Automated removal of duplicate entries (same job on 2 different sites)  
-  Upload data to more accesible location  
-  Automated filtering of data.  
-  Manual review of data.  
-  Automated formatting of approved entries.  
-  Post to twitter! (Manually)  
-
-
-
-TO DO:
-
-Open Hire emails  
-Facebook # Code is written. It just needs the permission of the gorup owners.
+  Automated filtering of data.  (Somewhat possible with the new more accessible Google Sheets file)
+  Creation of pipeline for manual review of job ads. (Simple formatting checks,
+  Automated formatting of approved jobs.  
+  Post to twitter!
