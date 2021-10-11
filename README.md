@@ -2,12 +2,12 @@
 A web scraping tool for collating all backstage technical theatre jobs. I have put this code onto the backburner now jobs are more abundant, I am busier and it is stably running on my server.
 
 The aim of this code is to create listings of job advertisments from the following sources:  
-Mandy           (Not happening due to legal issues)
-Curtain Call    ACTIVE
-Open Hire       Open Hire has no fixed formatting, API or website, so they are a little harder to do.
-The Stage       (The Stage has blocked me and won't answer any emails, so they are out)
-Arts Jobs       ACTIVE
-Facebook        (Backstage Theatre Jobs group)  (Group has been inactive)
+Mandy           --(Not happening due to legal issues).  
+Curtain Call    --ACTIVE.  
+Open Hire       --Open Hire has no fixed formatting, API or website, so they are a little harder to do.  
+The Stage       --(The Stage was working but has blocked me and won't answer any emails, so they are out).  
+Arts Jobs       --ACTIVE.  
+Facebook        --(Backstage Theatre Jobs group)  (Group has been inactive).
 
 
 Then post this list of job ads onto twitter (by Tom Lightbody) with the following details:
